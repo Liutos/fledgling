@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+.idea/
+fledgling/cli/config/config.ini
+!fledgling/cli/config/sample.ini
