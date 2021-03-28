@@ -1,4 +1,6 @@
 # -*- coding: utf8 -*-
+from abc import ABC, abstractmethod
+
 from requests import request
 
 from fledgling.app.entity.plan import Plan
@@ -6,9 +8,21 @@ from fledgling.app.entity.task import Task
 from fledgling.repository.nest_gateway import INestGateway
 
 
+class IEnigmaMachine(ABC):
+    @abstractmethod
+    def decrypt(self, cipher_text):
+        pass
+
+    @abstractmethod
+    def encrypt(self, plain_text):
+        pass
+
+
 class NestClient(INestGateway):
-    def __init__(self, *, hostname, port, protocol):
+    def __init__(self, *, hostname, enigma_machine, port, protocol):
+        assert isinstance(enigma_machine, IEnigmaMachine)
         self.cookies = None
+        self.enigma_machine = enigma_machine
         self.url_prefix = '{}://{}:{}'.format(protocol, hostname, port)
 
     def login(self, *, email, password):
@@ -52,7 +66,8 @@ class NestClient(INestGateway):
         task = response.json()['task']
         if not task:
             return None
+        brief = self.enigma_machine.decrypt(task['brief'])
         return Task(
-            brief=task['brief'],
+            brief=brief,
             id=task['id'],
         )

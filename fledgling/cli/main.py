@@ -2,6 +2,7 @@
 from fledgling.app.use_case.event_loop import EventLoopUseCase
 from fledgling.cli.alerter import Alerter
 from fledgling.cli.config import config
+from fledgling.cli.enigma_machine import MockEnigmaMachine
 from fledgling.cli.nest_client import NestClient
 from fledgling.repository.plan import PlanRepository
 from fledgling.repository.task import TaskRepository
@@ -12,7 +13,9 @@ if __name__ == '__main__':
     hostname = nest_section['hostname']
     port = nest_section['port']
     protocol = nest_section['protocol']
+    enigma_machine = MockEnigmaMachine()
     nest_client = NestClient(
+        enigma_machine=enigma_machine,
         hostname=hostname,
         port=port,
         protocol=protocol,
