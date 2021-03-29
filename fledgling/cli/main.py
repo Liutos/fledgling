@@ -10,7 +10,12 @@ from fledgling.repository.plan import PlanRepository
 from fledgling.repository.task import TaskRepository
 
 
-@click.command()
+@click.group()
+def cli():
+    pass
+
+
+@cli.command()
 def event_loop():
     enigma_machine_section = config['enigma_machine']
     enigma_machine = FernetEnigmaMachine(enigma_machine_section['password'])
@@ -44,4 +49,4 @@ def event_loop():
 
 
 if __name__ == '__main__':
-    event_loop()
+    cli()
