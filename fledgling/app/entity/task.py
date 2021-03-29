@@ -18,6 +18,10 @@ class Task:
 
 class ITaskRepository(ABC):
     @abstractmethod
+    def add(self, task: Task) -> Task:
+        pass
+
+    @abstractmethod
     def get_by_id(self, id_) -> Union[None, Task]:
         """
         查询指定的任务。

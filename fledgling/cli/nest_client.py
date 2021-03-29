@@ -56,6 +56,19 @@ class NestClient(INestGateway):
             task_id=plans[0]['task_id'],
         )
 
+    def task_create(self, *, brief):
+        url = '{}/task'.format(self.url_prefix)
+        response = request(
+            cookies=self.cookies,
+            json={
+                'brief': brief,
+            },
+            method='POST',
+            url=url,
+        )
+        id_ = response.json()['id']
+        return id_
+
     def task_get_by_id(self, id_):
         url = '{}/task/{}'.format(self.url_prefix, id_)
         response = request(

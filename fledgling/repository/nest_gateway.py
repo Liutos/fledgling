@@ -12,5 +12,9 @@ class INestGateway(ABC):
         pass
 
     @abstractmethod
+    def task_create(self, *, brief):
+        pass
+
+    @abstractmethod
     def task_get_by_id(self, id_):
         pass
