@@ -4,9 +4,16 @@ from typing import Union
 
 
 class Task:
-    def __init__(self, *, brief, id):
-        self.brief = brief
-        self.id = id
+    def __init__(self):
+        self.brief = None
+        self.id = None
+
+    @classmethod
+    def new(cls, *, brief, id_):
+        instance = Task()
+        instance.brief = brief
+        instance.id = id_
+        return instance
 
 
 class ITaskRepository(ABC):

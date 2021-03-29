@@ -67,7 +67,7 @@ class NestClient(INestGateway):
         if not task:
             return None
         brief = self.enigma_machine.decrypt(task['brief'])
-        return Task(
+        return Task.new(
             brief=brief,
-            id=task['id'],
+            id_=task['id'],
         )

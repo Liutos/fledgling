@@ -7,9 +7,9 @@ from fledgling.repository.nest_gateway import INestGateway
 
 class MockTaskRepository(ITaskRepository):
     def get_by_id(self, id_) -> Union[None, Task]:
-        return Task(
+        return Task.new(
             brief='Hello, world!',
-            id=id_,
+            id_=id_,
         )
 
 
