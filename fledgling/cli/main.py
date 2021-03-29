@@ -1,4 +1,6 @@
 # -*- coding: utf8 -*-
+import click
+
 from fledgling.app.use_case.event_loop import EventLoopUseCase
 from fledgling.cli.alerter import Alerter
 from fledgling.cli.config import config
@@ -8,7 +10,8 @@ from fledgling.repository.plan import PlanRepository
 from fledgling.repository.task import TaskRepository
 
 
-if __name__ == '__main__':
+@click.command()
+def event_loop():
     enigma_machine_section = config['enigma_machine']
     enigma_machine = FernetEnigmaMachine(enigma_machine_section['password'])
     nest_section = config['nest']
@@ -38,3 +41,7 @@ if __name__ == '__main__':
         ),
     )
     event_loop.run()
+
+
+if __name__ == '__main__':
+    event_loop()
