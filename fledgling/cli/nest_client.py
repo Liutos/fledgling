@@ -58,10 +58,11 @@ class NestClient(INestGateway):
 
     def task_create(self, *, brief):
         url = '{}/task'.format(self.url_prefix)
+        crypted_brief = self.enigma_machine.encrypt(brief)
         response = request(
             cookies=self.cookies,
             json={
-                'brief': brief,
+                'brief': crypted_brief,
             },
             method='POST',
             url=url,

@@ -9,7 +9,7 @@ class Task:
         self.id = None
 
     @classmethod
-    def new(cls, *, brief, id_):
+    def new(cls, *, brief, id_=None):
         instance = Task()
         instance.brief = brief
         instance.id = id_
