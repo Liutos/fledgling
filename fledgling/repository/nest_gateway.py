@@ -8,6 +8,10 @@ class INestGateway(ABC):
         pass
 
     @abstractmethod
+    def plan_create(self, *, task_id, trigger_time) -> int:
+        pass
+
+    @abstractmethod
     def plan_pop(self):
         pass
 

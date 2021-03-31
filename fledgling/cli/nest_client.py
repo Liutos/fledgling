@@ -36,6 +36,20 @@ class NestClient(INestGateway):
         )
         self.cookies = response.cookies
 
+    def plan_create(self, *, task_id, trigger_time) -> int:
+        json = {
+            'task_id': task_id,
+            'trigger_time': trigger_time,
+        }
+        url = '{}/plan'.format(self.url_prefix)
+        response = request(
+            cookies=self.cookies,
+            json=json,
+            method='POST',
+            url=url,
+        )
+        return response.json()['id']
+
     def plan_pop(self):
         url = '{}/plan/pop'.format(self.url_prefix)
         json = {
@@ -51,9 +65,9 @@ class NestClient(INestGateway):
         plans = response.json()['plans']
         if len(plans) == 0:
             return None
-        return Plan(
-            duration=30,
+        return Plan.new(
             task_id=plans[0]['task_id'],
+            trigger_time=plans[0]['trigger_time'],
         )
 
     def task_create(self, *, brief):
