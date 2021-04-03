@@ -29,6 +29,7 @@ setuptools.setup(
     install_requires=[
         "click",
         "cryptography",
+        "python-daemon",
         "requests",
         "xdg",
     ],

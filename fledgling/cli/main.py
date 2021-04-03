@@ -59,6 +59,14 @@ cli.add_command(create_task_command)
 event_loop_command = click.Command(
     'event-loop',
     callback=event_loop,
+    params=[
+        click.Option(
+            default=False,
+            param_decls=['--is-daemon'],
+            required=False,
+            type=click.BOOL,
+        ),
+    ],
     short_help=event_loop.__doc__,
 )
 cli.add_command(event_loop_command)
