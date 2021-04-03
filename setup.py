@@ -30,5 +30,6 @@ setuptools.setup(
         "click",
         "cryptography",
         "requests",
+        "xdg",
     ],
 )

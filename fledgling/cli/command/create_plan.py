@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 from fledgling.app.use_case.create_plan import CreatePlanUseCase, IParams
+from fledgling.cli.config import IniFileConfig
 from fledgling.cli.repository_factory import RepositoryFactory
 
 
@@ -16,11 +17,19 @@ class Params(IParams):
 
 
 def create_plan(task_id, trigger_time):
+    """
+    为任务创建一个计划。
+    """
+    config = IniFileConfig()
+    config.load()
+    repository_factory = RepositoryFactory(
+        config=config,
+    )
     use_case = CreatePlanUseCase(
         params=Params(
             task_id=task_id,
             trigger_time=trigger_time,
         ),
-        plan_repository=RepositoryFactory.for_plan(),
+        plan_repository=repository_factory.for_plan(),
     )
     use_case.run()
