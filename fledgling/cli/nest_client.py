@@ -50,6 +50,25 @@ class NestClient(INestGateway):
         )
         return response.json()['id']
 
+    def plan_list(self, *, page, per_page):
+        params = {
+            'page': page,
+            'per_page': per_page,
+        }
+        url = '{}/plan'.format(self.url_prefix)
+        response = request(
+            cookies=self.cookies,
+            method='GET',
+            params=params,
+            url=url,
+        )
+        plans = response.json()['plans']
+        return [Plan.new(
+            id_=plan['id'],
+            task_id=plan['task_id'],
+            trigger_time=plan['trigger_time'],
+        ) for plan in plans]
+
     def plan_pop(self):
         url = '{}/plan/pop'.format(self.url_prefix)
         json = {

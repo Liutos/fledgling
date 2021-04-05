@@ -16,5 +16,11 @@ class PlanRepository(IPlanRepository):
         plan.id = id_
         return plan
 
+    def list(self, *, page, per_page):
+        return self.nest_client.plan_list(
+            page=page,
+            per_page=per_page,
+        )
+
     def pop(self):
         return self.nest_client.plan_pop()

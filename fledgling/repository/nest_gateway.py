@@ -12,6 +12,10 @@ class INestGateway(ABC):
         pass
 
     @abstractmethod
+    def plan_list(self, *, page, per_page):
+        pass
+
+    @abstractmethod
     def plan_pop(self):
         pass
 

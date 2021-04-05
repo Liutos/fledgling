@@ -5,6 +5,7 @@ from fledgling.cli.command.create_config import create_config
 from fledgling.cli.command.create_plan import create_plan
 from fledgling.cli.command.create_task import create_task
 from fledgling.cli.command.event_loop import event_loop
+from fledgling.cli.command.list_plan import list_plan
 
 cli = click.Group()
 
@@ -70,6 +71,27 @@ event_loop_command = click.Command(
     short_help=event_loop.__doc__,
 )
 cli.add_command(event_loop_command)
+
+list_plan_command = click.Command(
+    'list-plan',
+    callback=list_plan,
+    params=[
+        click.Option(
+            default=1,
+            param_decls=['--page'],
+            required=False,
+            type=click.INT,
+        ),
+        click.Option(
+            default=10,
+            param_decls=['--per-page'],
+            required=False,
+            type=click.INT,
+        ),
+    ],
+    short_help=list_plan.__doc__,
+)
+cli.add_command(list_plan_command)
 
 
 if __name__ == '__main__':
