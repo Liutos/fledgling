@@ -26,3 +26,7 @@ class INestGateway(ABC):
     @abstractmethod
     def task_get_by_id(self, id_):
         pass
+
+    @abstractmethod
+    def task_list(self, *, page, per_page):
+        pass

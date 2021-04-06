@@ -27,3 +27,10 @@ class ITaskRepository(ABC):
         查询指定的任务。
         """
         pass
+
+    @abstractmethod
+    def list(self, *, page, per_page):
+        """
+        列出任务。
+        """
+        pass

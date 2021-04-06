@@ -29,3 +29,9 @@ class TaskRepository(ITaskRepository):
 
     def get_by_id(self, id_) -> Union[None, Task]:
         return self.nest_client.task_get_by_id(id_)
+
+    def list(self, *, page, per_page):
+        return self.nest_client.task_list(
+            page=page,
+            per_page=per_page,
+        )

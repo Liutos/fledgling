@@ -6,6 +6,7 @@ from fledgling.cli.command.create_plan import create_plan
 from fledgling.cli.command.create_task import create_task
 from fledgling.cli.command.event_loop import event_loop
 from fledgling.cli.command.list_plan import list_plan
+from fledgling.cli.command.list_task import list_task
 
 cli = click.Group()
 
@@ -92,6 +93,8 @@ list_plan_command = click.Command(
     short_help=list_plan.__doc__,
 )
 cli.add_command(list_plan_command)
+
+cli.add_command(list_task)
 
 
 if __name__ == '__main__':

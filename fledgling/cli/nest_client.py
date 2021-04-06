@@ -118,3 +118,21 @@ class NestClient(INestGateway):
             brief=brief,
             id_=task['id'],
         )
+
+    def task_list(self, *, page, per_page):
+        params = {
+            'page': page,
+            'per_page': per_page,
+        }
+        url = '{}/task'.format(self.url_prefix)
+        response = request(
+            cookies=self.cookies,
+            params=params,
+            method='GET',
+            url=url,
+        )
+        tasks = response.json()['tasks']
+        return [Task.new(
+            brief=self.enigma_machine.decrypt(task['brief']),
+            id_=task['id'],
+        ) for task in tasks]
