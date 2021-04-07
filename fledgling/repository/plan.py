@@ -10,6 +10,7 @@ class PlanRepository(IPlanRepository):
 
     def add(self, plan: Plan) -> Plan:
         id_ = self.nest_client.plan_create(
+            repeat_type=plan.repeat_type,
             task_id=plan.task_id,
             trigger_time=plan.trigger_time,
         )

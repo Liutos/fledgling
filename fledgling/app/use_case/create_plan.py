@@ -6,6 +6,10 @@ from fledgling.app.entity.plan import IPlanRepository, Plan
 
 class IParams(ABC):
     @abstractmethod
+    def get_repeat_type(self) -> str:
+        pass
+
+    @abstractmethod
     def get_task_id(self) -> int:
         pass
 
@@ -23,9 +27,11 @@ class CreatePlanUseCase:
 
     def run(self):
         params = self.params
+        repeat_type = params.get_repeat_type()
         task_id = params.get_task_id()
         trigger_time = params.get_trigger_time()
         plan = Plan.new(
+            repeat_type=repeat_type,
             task_id=task_id,
             trigger_time=trigger_time,
         )

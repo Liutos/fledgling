@@ -5,9 +5,13 @@ from fledgling.cli.repository_factory import RepositoryFactory
 
 
 class Params(IParams):
-    def __init__(self, *, task_id, trigger_time):
+    def __init__(self, *, repeat_type=None, task_id, trigger_time):
+        self.repeat_type = repeat_type
         self.task_id = task_id
         self.trigger_time = trigger_time
+
+    def get_repeat_type(self) -> str:
+        return self.repeat_type
 
     def get_task_id(self) -> int:
         return self.task_id
@@ -16,7 +20,7 @@ class Params(IParams):
         return self.trigger_time
 
 
-def create_plan(task_id, trigger_time):
+def create_plan(repeat_type, task_id, trigger_time):
     """
     为任务创建一个计划。
     """
@@ -27,6 +31,7 @@ def create_plan(task_id, trigger_time):
     )
     use_case = CreatePlanUseCase(
         params=Params(
+            repeat_type=repeat_type,
             task_id=task_id,
             trigger_time=trigger_time,
         ),

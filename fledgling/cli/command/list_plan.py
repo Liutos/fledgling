@@ -22,7 +22,10 @@ class Presenter:
 
     def format(self):
         for plan in self.plans:
-            print('{}\t{}\t{}'.format(plan.id, plan.trigger_time, plan.task.brief))
+            row = [plan.id, plan.trigger_time, plan.task.brief]
+            if plan.repeat_type:
+                row.append(plan.repeat_type)
+            print('\t'.join([str(item) for item in row]))
 
 
 def list_plan(*, page, per_page):

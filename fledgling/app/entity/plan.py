@@ -8,14 +8,16 @@ class Plan:
     def __init__(self):
         self.duration = 60
         self.id = None
+        self.repeat_type = None
         self.task = None
         self.task_id = None
         self.trigger_time = None
 
     @classmethod
-    def new(cls, *, id_=None, task_id, trigger_time):
+    def new(cls, *, id_=None, repeat_type=None, task_id, trigger_time):
         instance = Plan()
         instance.id = id_
+        instance.repeat_type = repeat_type
         instance.task_id = task_id
         instance.trigger_time = trigger_time
         return instance

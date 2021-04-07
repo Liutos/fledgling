@@ -36,8 +36,9 @@ class NestClient(INestGateway):
         )
         self.cookies = response.cookies
 
-    def plan_create(self, *, task_id, trigger_time) -> int:
+    def plan_create(self, *, repeat_type=None, task_id, trigger_time) -> int:
         json = {
+            'repeat_type': repeat_type,
             'task_id': task_id,
             'trigger_time': trigger_time,
         }
@@ -65,6 +66,7 @@ class NestClient(INestGateway):
         plans = response.json()['plans']
         return [Plan.new(
             id_=plan['id'],
+            repeat_type=plan['repeat_type'],
             task_id=plan['task_id'],
             trigger_time=plan['trigger_time'],
         ) for plan in plans]

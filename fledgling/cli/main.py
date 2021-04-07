@@ -30,6 +30,11 @@ create_plan_command = click.Command(
     callback=create_plan,
     params=[
         click.Option(
+            param_decls=['--repeat-type'],
+            required=False,
+            type=click.STRING,
+        ),
+        click.Option(
             param_decls=['--task-id'],
             required=True,
             type=click.INT,
