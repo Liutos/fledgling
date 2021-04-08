@@ -25,3 +25,8 @@ class PlanRepository(IPlanRepository):
 
     def pop(self):
         return self.nest_client.plan_pop()
+
+    def remove(self, id_: int):
+        return self.nest_client.plan_delete(
+            plan_id=id_,
+        )

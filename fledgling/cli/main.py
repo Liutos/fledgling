@@ -4,6 +4,7 @@ import click
 from fledgling.cli.command.create_config import create_config
 from fledgling.cli.command.create_plan import create_plan
 from fledgling.cli.command.create_task import create_task
+from fledgling.cli.command.delete_plan import delete_plan
 from fledgling.cli.command.event_loop import event_loop
 from fledgling.cli.command.list_plan import list_plan
 from fledgling.cli.command.list_task import list_task
@@ -62,6 +63,8 @@ create_task_command = click.Command(
     short_help=create_task.__doc__,
 )
 cli.add_command(create_task_command)
+
+cli.add_command(delete_plan)
 
 event_loop_command = click.Command(
     'event-loop',

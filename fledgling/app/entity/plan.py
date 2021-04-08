@@ -44,3 +44,10 @@ class IPlanRepository(ABC):
         获取一个当前能处理的计划，并且之后不再获取到它。
         """
         pass
+
+    @abstractmethod
+    def remove(self, id_: int):
+        """
+        删除一个指定的计划，之后无法再获取到它。
+        """
+        pass

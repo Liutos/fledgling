@@ -51,6 +51,14 @@ class NestClient(INestGateway):
         )
         return response.json()['id']
 
+    def plan_delete(self, *, plan_id):
+        url = '{}/plan/{}'.format(self.url_prefix, plan_id)
+        request(
+            cookies=self.cookies,
+            method='DELETE',
+            url=url,
+        )
+
     def plan_list(self, *, page, per_page):
         params = {
             'page': page,
