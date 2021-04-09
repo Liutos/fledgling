@@ -1,11 +1,18 @@
 # -*- coding: utf8 -*-
 from abc import ABC, abstractmethod
+import logging
 
-from requests import request
+from requests import (
+    ConnectionError,
+    request,
+)
 
 from fledgling.app.entity.plan import Plan
 from fledgling.app.entity.task import Task
-from fledgling.repository.nest_gateway import INestGateway
+from fledgling.repository.nest_gateway import (
+    INestGateway,
+    NetworkError,
+)
 
 
 class IEnigmaMachine(ABC):
@@ -84,12 +91,16 @@ class NestClient(INestGateway):
         json = {
             'size': 1,
         }
-        response = request(
-            cookies=self.cookies,
-            json=json,
-            method='POST',
-            url=url,
-        )
+        try:
+            response = request(
+                cookies=self.cookies,
+                json=json,
+                method='POST',
+                url=url,
+            )
+        except ConnectionError as e:
+            logging.warning('请求{}失败：{}'.format(url, str(e)))
+            raise NetworkError()
         print('response.json()', response.json())
         plans = response.json()['plans']
         if len(plans) == 0:

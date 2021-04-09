@@ -2,6 +2,10 @@
 from abc import ABC, abstractmethod
 
 
+class NetworkError(Exception):
+    pass
+
+
 class INestGateway(ABC):
     @abstractmethod
     def login(self, *, email, password):

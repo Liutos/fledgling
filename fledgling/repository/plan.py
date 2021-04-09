@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 from fledgling.app.entity.plan import IPlanRepository, Plan
-from fledgling.repository.nest_gateway import INestGateway
+from fledgling.repository.nest_gateway import INestGateway, NetworkError
 
 
 class PlanRepository(IPlanRepository):
@@ -24,7 +24,10 @@ class PlanRepository(IPlanRepository):
         )
 
     def pop(self):
-        return self.nest_client.plan_pop()
+        try:
+            return self.nest_client.plan_pop()
+        except NetworkError:
+            return None
 
     def remove(self, id_: int):
         return self.nest_client.plan_delete(
