@@ -35,12 +35,12 @@ class RepositoryFactory:
         assert isinstance(config, IConfig)
         enigma_machine_section = config['enigma_machine']
         enigma_machine = FernetEnigmaMachine(enigma_machine_section['password'])
+        self.enigma_machine = enigma_machine
         nest_section = config['nest']
         hostname = nest_section['hostname']
         port = nest_section['port']
         protocol = nest_section['protocol']
         nest_client = NestClient(
-            enigma_machine=enigma_machine,
             hostname=hostname,
             port=port,
             protocol=protocol,
@@ -61,5 +61,6 @@ class RepositoryFactory:
 
     def for_task(self):
         return TaskRepository(
+            enigma_machine=self.enigma_machine,
             nest_client=self.nest_client,
         )
