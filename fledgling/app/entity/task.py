@@ -3,6 +3,10 @@ from abc import ABC, abstractmethod
 from typing import Union
 
 
+class TaskRepositoryError(Exception):
+    pass
+
+
 class Task:
     def __init__(self):
         self.brief = None

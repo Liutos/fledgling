@@ -1,7 +1,10 @@
 # -*- coding: utf8 -*-
+from abc import ABC, abstractmethod
 from typing import List, Union
 
-from abc import ABC, abstractmethod
+
+class PlanRepositoryError(Exception):
+    pass
 
 
 class Plan:

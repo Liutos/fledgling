@@ -1,10 +1,18 @@
 # -*- coding: utf8 -*-
 from abc import ABC, abstractmethod
+import logging
 import subprocess
 import time
 
-from fledgling.app.entity.plan import IPlanRepository, Plan
-from fledgling.app.entity.task import ITaskRepository
+from fledgling.app.entity.plan import (
+    IPlanRepository,
+    Plan,
+    PlanRepositoryError,
+)
+from fledgling.app.entity.task import (
+    ITaskRepository,
+    TaskRepositoryError,
+)
 
 
 _IDLE_SECONDS = 10
@@ -44,20 +52,25 @@ class EventLoopUseCase:
 
     def run(self):
         while True:
-            plan = self.plan_repository.pop()
-            if plan:
-                task_id = plan.task_id
-                task = self.task_repository.get_by_id(task_id)
-                child_process = self.alerter.alert(
-                    plan=plan,
-                    task=task,
-                )
-                self._keep_child_process(
-                    plan=plan,
-                    process=child_process,
-                )
-            else:
-                print('没有可处理的计划')
+            try:
+                plan = self.plan_repository.pop()
+                if plan:
+                    task_id = plan.task_id
+                    task = self.task_repository.get_by_id(task_id)
+                    child_process = self.alerter.alert(
+                        plan=plan,
+                        task=task,
+                    )
+                    self._keep_child_process(
+                        plan=plan,
+                        process=child_process,
+                    )
+                else:
+                    print('没有可处理的计划')
+            except PlanRepositoryError:
+                logging.warning('获取计划失败')
+            except TaskRepositoryError:
+                logging.warning('获取任务失败')
             self._sort_out_children()
             time.sleep(_IDLE_SECONDS)
 

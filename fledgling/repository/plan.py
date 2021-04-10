@@ -1,5 +1,9 @@
 # -*- coding: utf8 -*-
-from fledgling.app.entity.plan import IPlanRepository, Plan
+from fledgling.app.entity.plan import (
+    IPlanRepository,
+    Plan,
+    PlanRepositoryError,
+)
 from fledgling.repository.nest_gateway import INestGateway, NetworkError
 
 
@@ -27,7 +31,7 @@ class PlanRepository(IPlanRepository):
         try:
             return self.nest_client.plan_pop()
         except NetworkError:
-            return None
+            raise PlanRepositoryError()
 
     def remove(self, id_: int):
         return self.nest_client.plan_delete(

@@ -1,19 +1,12 @@
 # -*- coding: utf8 -*-
 from typing import Union
 
-from fledgling.app.entity.task import ITaskRepository, Task
-from fledgling.repository.nest_gateway import INestGateway
-
-
-class MockTaskRepository(ITaskRepository):
-    def add(self, task: Task) -> Task:
-        pass
-
-    def get_by_id(self, id_) -> Union[None, Task]:
-        return Task.new(
-            brief='Hello, world!',
-            id_=id_,
-        )
+from fledgling.app.entity.task import (
+    ITaskRepository,
+    Task,
+    TaskRepositoryError,
+)
+from fledgling.repository.nest_gateway import INestGateway, NetworkError
 
 
 class TaskRepository(ITaskRepository):
@@ -28,7 +21,10 @@ class TaskRepository(ITaskRepository):
         return self.get_by_id(id_)
 
     def get_by_id(self, id_) -> Union[None, Task]:
-        return self.nest_client.task_get_by_id(id_)
+        try:
+            return self.nest_client.task_get_by_id(id_)
+        except NetworkError:
+            raise TaskRepositoryError()
 
     def list(self, *, page, per_page):
         return self.nest_client.task_list(
