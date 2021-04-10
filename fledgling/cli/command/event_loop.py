@@ -1,4 +1,5 @@
 # -*- coding: utf8 -*-
+import click
 import daemon
 
 from fledgling.app.use_case.event_loop import EventLoopUseCase
@@ -7,6 +8,8 @@ from fledgling.cli.config import IniFileConfig
 from fledgling.cli.repository_factory import RepositoryFactory
 
 
+@click.command()
+@click.option('--is-daemon', default=False, type=click.BOOL)
 def event_loop(is_daemon: bool):
     """
     启动事件循环拉取计划并弹出提醒。

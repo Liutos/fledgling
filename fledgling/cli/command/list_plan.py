@@ -1,4 +1,6 @@
 # -*- coding: utf8 -*-
+import click
+
 from fledgling.app.use_case.list_plan import IParams, ListPlanUseCase
 from fledgling.cli.config import IniFileConfig
 from fledgling.cli.repository_factory import RepositoryFactory
@@ -28,6 +30,9 @@ class Presenter:
             print('\t'.join([str(item) for item in row]))
 
 
+@click.command()
+@click.option('--page', default=1, type=click.INT)
+@click.option('--per-page', default=10, type=click.INT)
 def list_plan(*, page, per_page):
     """
     列出接下来的计划。

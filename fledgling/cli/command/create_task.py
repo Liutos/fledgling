@@ -1,4 +1,6 @@
 # -*- coding: utf8 -*-
+import click
+
 from fledgling.app.use_case.create_task import CreateTaskUseCase, IParams
 from fledgling.cli.config import IniFileConfig
 from fledgling.cli.repository_factory import RepositoryFactory
@@ -12,6 +14,8 @@ class Params(IParams):
         return self.brief
 
 
+@click.command()
+@click.option('--brief', required=True, type=str)
 def create_task(*, brief):
     """
     创建一个任务。

@@ -1,4 +1,6 @@
 # -*- coding: utf8 -*-
+import click
+
 from fledgling.app.use_case.create_plan import CreatePlanUseCase, IParams
 from fledgling.cli.config import IniFileConfig
 from fledgling.cli.repository_factory import RepositoryFactory
@@ -20,6 +22,10 @@ class Params(IParams):
         return self.trigger_time
 
 
+@click.command()
+@click.option('--repeat-type', type=click.STRING)
+@click.option('--task-id', required=True, type=click.INT)
+@click.option('--trigger-time', required=True, type=str)
 def create_plan(repeat_type, task_id, trigger_time):
     """
     为任务创建一个计划。
