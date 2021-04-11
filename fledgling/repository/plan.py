@@ -21,11 +21,10 @@ class PlanRepository(IPlanRepository):
                 'task_id': plan.task_id,
                 'trigger_time': plan.trigger_time,
             }
-            url = '{}/plan'.format(self.nest_client.url_prefix)
             response = self.nest_client.request(
                 json=json,
                 method='POST',
-                url=url,
+                pathname='/plan',
             )
             id_ = response.json()['id']
             plan.id = id_
@@ -35,18 +34,18 @@ class PlanRepository(IPlanRepository):
                 'repeat_type': plan.repeat_type,
                 'trigger_time': plan.trigger_time,
             }
-            url = '{}/plan/{}'.format(self.nest_client.url_prefix, plan.id)
+            pathname = '/plan/{}'.format(plan.id)
             self.nest_client.request(
                 json=json,
                 method='PATCH',
-                url=url,
+                pathname=pathname,
             )
 
     def get(self, *, id_):
-        url = '{}/plan/{}'.format(self.nest_client.url_prefix, id_)
+        pathname = '/plan/{}'.format(id_)
         response = self.nest_client.request(
             method='GET',
-            url=url,
+            pathname=pathname,
         )
         result = response.json()['result']
         if result is None:
@@ -62,11 +61,10 @@ class PlanRepository(IPlanRepository):
             'page': page,
             'per_page': per_page,
         }
-        url = '{}/plan'.format(self.nest_client.url_prefix)
         response = self.nest_client.request(
             method='GET',
             params=params,
-            url=url,
+            pathname='/plan',
         )
         plans = response.json()['plans']
         return [Plan.new(
@@ -77,7 +75,6 @@ class PlanRepository(IPlanRepository):
         ) for plan in plans]
 
     def pop(self):
-        url = '{}/plan/pop'.format(self.nest_client.url_prefix)
         json = {
             'size': 1,
         }
@@ -85,7 +82,7 @@ class PlanRepository(IPlanRepository):
             response = self.nest_client.request(
                 json=json,
                 method='POST',
-                url=url,
+                pathname='/plan/pop',
             )
         except NetworkError:
             raise PlanRepositoryError()
@@ -99,8 +96,8 @@ class PlanRepository(IPlanRepository):
         )
 
     def remove(self, id_: int):
-        url = '{}/plan/{}'.format(self.nest_client.url_prefix, id_)
+        url = '/plan/{}'.format(id_)
         self.nest_client.request(
             method='DELETE',
-            url=url,
+            pathname=url,
         )

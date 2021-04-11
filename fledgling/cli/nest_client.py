@@ -28,10 +28,11 @@ class NestClient(INestGateway):
         )
         self.cookies = response.cookies
 
-    def request(self, **kwargs):
+    def request(self, *, pathname, **kwargs):
         try:
             return request(
                 cookies=self.cookies,
+                url='{}{}'.format(self.url_prefix, pathname),
                 **kwargs
             )
         except ConnectionError as e:

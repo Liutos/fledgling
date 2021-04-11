@@ -28,24 +28,23 @@ class TaskRepository(ITaskRepository):
         self.nest_client = nest_client
 
     def add(self, task: Task) -> Task:
-        url = '{}/task'.format(self.nest_client.url_prefix)
         crypted_brief = self.enigma_machine.encrypt(task.brief)
         response = self.nest_client.request(
             json={
                 'brief': crypted_brief,
             },
             method='POST',
-            url=url,
+            pathname='/task',
         )
         id_ = response.json()['id']
         return self.get_by_id(id_)
 
     def get_by_id(self, id_) -> Union[None, Task]:
         try:
-            url = '{}/task/{}'.format(self.nest_client.url_prefix, id_)
+            pathname = '/task/{}'.format(id_)
             response = self.nest_client.request(
                 method='GET',
-                url=url,
+                pathname=pathname,
             )
             task = response.json()['task']
             if not task:
@@ -63,11 +62,10 @@ class TaskRepository(ITaskRepository):
             'page': page,
             'per_page': per_page,
         }
-        url = '{}/task'.format(self.nest_client.url_prefix)
         response = self.nest_client.request(
             params=params,
             method='GET',
-            url=url,
+            pathname='/task',
         )
         tasks = response.json()['tasks']
         return [Task.new(
