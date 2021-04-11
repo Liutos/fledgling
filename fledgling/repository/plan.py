@@ -15,19 +15,46 @@ class PlanRepository(IPlanRepository):
         self.nest_client = nest_client
 
     def add(self, plan: Plan) -> Plan:
-        json = {
-            'repeat_type': plan.repeat_type,
-            'task_id': plan.task_id,
-            'trigger_time': plan.trigger_time,
-        }
-        url = '{}/plan'.format(self.nest_client.url_prefix)
+        if plan.id is None:
+            json = {
+                'repeat_type': plan.repeat_type,
+                'task_id': plan.task_id,
+                'trigger_time': plan.trigger_time,
+            }
+            url = '{}/plan'.format(self.nest_client.url_prefix)
+            response = self.nest_client.request(
+                json=json,
+                method='POST',
+                url=url,
+            )
+            id_ = response.json()['id']
+            plan.id = id_
+            return plan
+        else:
+            json = {
+                'repeat_type': plan.repeat_type,
+                'trigger_time': plan.trigger_time,
+            }
+            url = '{}/plan/{}'.format(self.nest_client.url_prefix, plan.id)
+            self.nest_client.request(
+                json=json,
+                method='PATCH',
+                url=url,
+            )
+
+    def get(self, *, id_):
+        url = '{}/plan/{}'.format(self.nest_client.url_prefix, id_)
         response = self.nest_client.request(
-            json=json,
-            method='POST',
+            method='GET',
             url=url,
         )
-        id_ = response.json()['id']
-        plan.id = id_
+        result = response.json()['result']
+        if result is None:
+            return None
+        plan = Plan()
+        plan.id = result['id']
+        plan.task_id = result['task_id']
+        plan.trigger_time = result['trigger_time']
         return plan
 
     def list(self, *, page, per_page):

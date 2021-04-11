@@ -30,7 +30,14 @@ class IPlanRepository(ABC):
     @abstractmethod
     def add(self, plan: Plan) -> Plan:
         """
-        将一个计划保存起来。
+        将一个计划保存起来，或更新一个已有的计划。
+        """
+        pass
+
+    @abstractmethod
+    def get(self, *, id_):
+        """
+        获取指定的计划。
         """
         pass
 

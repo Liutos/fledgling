@@ -4,6 +4,7 @@ import logging
 
 from xdg import xdg_data_home
 
+from fledgling.cli.command.change_plan import change_plan
 from fledgling.cli.command.create_config import create_config
 from fledgling.cli.command.create_plan import create_plan
 from fledgling.cli.command.create_task import create_task
@@ -14,6 +15,7 @@ from fledgling.cli.command.list_task import list_task
 
 cli = click.Group()
 
+cli.add_command(change_plan)
 cli.add_command(create_config)
 
 cli.add_command(create_plan)
