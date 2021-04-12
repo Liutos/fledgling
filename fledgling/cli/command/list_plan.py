@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 import click
+from tabulate import tabulate
 
 from fledgling.app.use_case.list_plan import IParams, ListPlanUseCase
 from fledgling.cli.config import IniFileConfig
@@ -23,11 +24,16 @@ class Presenter:
         self.plans = plans
 
     def format(self):
+        table = []
         for plan in self.plans:
             row = [plan.id, plan.trigger_time, plan.task.brief]
             if plan.repeat_type:
                 row.append(plan.repeat_type)
-            print('\t'.join([str(item) for item in row]))
+            table.append(row)
+        print(tabulate(
+            headers=['计划ID', '计划时间', '任务简述', '重复类型'],
+            tabular_data=table,
+        ))
 
 
 @click.command()

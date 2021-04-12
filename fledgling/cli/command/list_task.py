@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 import click
+from tabulate import tabulate
 
 from fledgling.app.use_case.list_task import IParams, ListTaskUseCase
 from fledgling.cli.config import IniFileConfig
@@ -37,5 +38,10 @@ def list_task(*, page, per_page):
         task_repository=repository_factory.for_task(),
     )
     tasks = use_case.run()
+    table = []
     for task in tasks:
-        click.echo('{}\t{}'.format(task.id, task.brief))
+        table.append([task.id, task.brief])
+    click.echo(tabulate(
+        headers=['任务ID', '任务简述'],
+        tabular_data=table,
+    ))

@@ -32,6 +32,8 @@ setuptools.setup(
         "cryptography",
         "python-daemon",
         "requests",
+        "tabulate",
+        "wcwidth",
         "xdg",
     ],
 )
