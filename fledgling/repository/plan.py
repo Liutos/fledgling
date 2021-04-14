@@ -35,7 +35,10 @@ class PlanRepository(IPlanRepository):
             json = {
                 'repeat_type': plan.repeat_type,
                 'trigger_time': plan.trigger_time,
+                'visible_hours': list(plan.visible_hours),
+                'visible_wdays': list(plan.visible_wdays),
             }
+            print('json', json)
             pathname = '/plan/{}'.format(plan.id)
             self.nest_client.request(
                 json=json,
