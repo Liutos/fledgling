@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 import click
+from typing import List, Set, Union
 
 from fledgling.app.use_case.create_plan import CreatePlanUseCase, IParams
 from fledgling.cli.config import IniFileConfig
@@ -7,10 +8,14 @@ from fledgling.cli.repository_factory import RepositoryFactory
 
 
 class Params(IParams):
-    def __init__(self, *, repeat_type=None, task_id, trigger_time):
+    def __init__(self, *, repeat_type=None, task_id, trigger_time,
+                 visible_hours: Union[None, List[int]] = None,
+                 visible_wdays: Union[None, List[int]] = None):
         self.repeat_type = repeat_type
         self.task_id = task_id
         self.trigger_time = trigger_time
+        self.visible_hours = set(visible_hours or [])
+        self.visible_wdays = set(visible_wdays or [])
 
     def get_repeat_type(self) -> str:
         return self.repeat_type
@@ -21,12 +26,27 @@ class Params(IParams):
     def get_trigger_time(self) -> str:
         return self.trigger_time
 
+    def get_visible_hours(self) -> Set[int]:
+        return self.visible_hours
+
+    def get_visible_wdays(self) -> Set[int]:
+        return self.visible_wdays
+
+
+def validate_visible_hours(ctx, param, value: Union[None, str]):
+    if value is None:
+        return None
+
+    return map(int, value.split(','))
+
 
 @click.command()
 @click.option('--repeat-type', type=click.STRING)
 @click.option('--task-id', required=True, type=click.INT)
 @click.option('--trigger-time', required=True, type=str)
-def create_plan(repeat_type, task_id, trigger_time):
+@click.option('--visible-hours', callback=validate_visible_hours, type=click.STRING)
+@click.option('--visible-wdays', callback=validate_visible_hours, type=click.STRING)
+def create_plan(repeat_type, task_id, trigger_time, visible_hours, visible_wdays):
     """
     为任务创建一个计划。
     """
@@ -40,6 +60,8 @@ def create_plan(repeat_type, task_id, trigger_time):
             repeat_type=repeat_type,
             task_id=task_id,
             trigger_time=trigger_time,
+            visible_hours=visible_hours,
+            visible_wdays=visible_wdays,
         ),
         plan_repository=repository_factory.for_plan(),
     )

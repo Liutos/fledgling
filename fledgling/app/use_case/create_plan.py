@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 from abc import ABC, abstractmethod
+from typing import Set
 
 from fledgling.app.entity.plan import IPlanRepository, Plan
 
@@ -17,6 +18,14 @@ class IParams(ABC):
     def get_trigger_time(self) -> str:
         pass
 
+    @abstractmethod
+    def get_visible_hours(self) -> Set[int]:
+        pass
+
+    @abstractmethod
+    def get_visible_wdays(self) -> Set[int]:
+        pass
+
 
 class CreatePlanUseCase:
     def __init__(self, *, params, plan_repository):
@@ -30,9 +39,13 @@ class CreatePlanUseCase:
         repeat_type = params.get_repeat_type()
         task_id = params.get_task_id()
         trigger_time = params.get_trigger_time()
+        visible_hours = params.get_visible_hours()
+        visible_wdays = params.get_visible_wdays()
         plan = Plan.new(
             repeat_type=repeat_type,
             task_id=task_id,
             trigger_time=trigger_time,
+            visible_hours=visible_hours,
+            visible_wdays=visible_wdays,
         )
         return self.plan_repository.add(plan)

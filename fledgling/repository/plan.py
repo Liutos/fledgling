@@ -20,6 +20,8 @@ class PlanRepository(IPlanRepository):
                 'repeat_type': plan.repeat_type,
                 'task_id': plan.task_id,
                 'trigger_time': plan.trigger_time,
+                'visible_hours': list(plan.visible_hours),
+                'visible_wdays': list(plan.visible_wdays),
             }
             response = self.nest_client.request(
                 json=json,
