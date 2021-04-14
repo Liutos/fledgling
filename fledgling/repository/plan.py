@@ -50,10 +50,13 @@ class PlanRepository(IPlanRepository):
         result = response.json()['result']
         if result is None:
             return None
+        # TODO: 统一get/list方法中将HTTP响应结果转换为Plan实例的代码。
         plan = Plan()
         plan.id = result['id']
         plan.task_id = result['task_id']
         plan.trigger_time = result['trigger_time']
+        plan.visible_hours = set(result['visible_hours'])
+        plan.visible_wdays = set(result['visible_wdays'])
         return plan
 
     def list(self, *, page, per_page):
@@ -72,6 +75,8 @@ class PlanRepository(IPlanRepository):
             repeat_type=plan['repeat_type'],
             task_id=plan['task_id'],
             trigger_time=plan['trigger_time'],
+            visible_hours=set(plan['visible_hours']),
+            visible_wdays=set(plan['visible_wdays']),
         ) for plan in plans]
 
     def pop(self):

@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 import click
+from datetime import datetime
 from tabulate import tabulate
 
 from fledgling.app.use_case.list_plan import IParams, ListPlanUseCase
@@ -25,13 +26,18 @@ class Presenter:
 
     def format(self):
         table = []
+        now = datetime.now()
         for plan in self.plans:
-            row = [plan.id, plan.trigger_time, plan.task.brief]
-            if plan.repeat_type:
-                row.append(plan.repeat_type)
+            row = [
+                plan.id,
+                plan.trigger_time,
+                plan.task.brief,
+                plan.repeat_type,
+                '是' if plan.is_visible(trigger_time=now) else '否',
+            ]
             table.append(row)
         print(tabulate(
-            headers=['计划ID', '计划时间', '任务简述', '重复类型'],
+            headers=['计划ID', '计划时间', '任务简述', '重复类型', '是否可见'],
             tabular_data=table,
         ))
 
