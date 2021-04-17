@@ -11,4 +11,6 @@ class Alerter(IAlerter):
         args.append('alerter')
         args.append('-message')
         args.append(task.brief)
+        args.append('-sound')
+        args.append('default')
         return subprocess.Popen(args)
