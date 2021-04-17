@@ -1,6 +1,4 @@
 # -*- coding: utf8 -*-
-import logging
-
 from fledgling.app.entity.plan import (
     IPlanRepository,
     Plan,
@@ -28,7 +26,11 @@ class PlanRepository(IPlanRepository):
                 method='POST',
                 pathname='/plan',
             )
-            id_ = response.json()['id']
+            response = response.json()
+            if response['status'] == 'failure':
+                raise PlanRepositoryError(response['error']['message'])
+
+            id_ = response['result']['id']
             plan.id = id_
             return plan
         else:
@@ -40,11 +42,15 @@ class PlanRepository(IPlanRepository):
             }
             print('json', json)
             pathname = '/plan/{}'.format(plan.id)
-            self.nest_client.request(
+            response = self.nest_client.request(
                 json=json,
                 method='PATCH',
                 pathname=pathname,
             )
+            # TODO: 统一到处一样的异常处理代码
+            response = response.json()
+            if response['status'] == 'failure':
+                raise PlanRepositoryError(response['error']['message'])
 
     def get(self, *, id_):
         pathname = '/plan/{}'.format(id_)
@@ -52,7 +58,11 @@ class PlanRepository(IPlanRepository):
             method='GET',
             pathname=pathname,
         )
-        result = response.json()['result']
+        response = response.json()
+        if response['status'] == 'failure':
+            raise PlanRepositoryError(response['error']['message'])
+
+        result = response['result']
         if result is None:
             return None
         # TODO: 统一get/list方法中将HTTP响应结果转换为Plan实例的代码。
@@ -74,7 +84,11 @@ class PlanRepository(IPlanRepository):
             params=params,
             pathname='/plan',
         )
-        plans = response.json()['plans']
+        response = response.json()
+        if response['status'] == 'failure':
+            raise PlanRepositoryError(response['error']['message'])
+
+        plans = response['result']
         return [Plan.new(
             id_=plan['id'],
             repeat_type=plan['repeat_type'],
@@ -96,8 +110,12 @@ class PlanRepository(IPlanRepository):
             )
         except NetworkError:
             raise PlanRepositoryError()
-        print('response.json()', response.json())
-        plans = response.json()['plans']
+        response = response.json()
+        if response['status'] == 'failure':
+            raise PlanRepositoryError(response['error']['message'])
+
+        print('response', response)
+        plans = response['result']
         if len(plans) == 0:
             return None
         return Plan.new(
@@ -107,7 +125,10 @@ class PlanRepository(IPlanRepository):
 
     def remove(self, id_: int):
         url = '/plan/{}'.format(id_)
-        self.nest_client.request(
+        response = self.nest_client.request(
             method='DELETE',
             pathname=url,
         )
+        response = response.json()
+        if response['status'] == 'failure':
+            raise PlanRepositoryError(response['error']['message'])

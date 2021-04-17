@@ -36,7 +36,11 @@ class TaskRepository(ITaskRepository):
             method='POST',
             pathname='/task',
         )
-        id_ = response.json()['id']
+        response = response.json()
+        if response['status'] == 'failure':
+            raise TaskRepositoryError(response['error']['message'])
+
+        id_ = response['result']['id']
         return self.get_by_id(id_)
 
     def get_by_id(self, id_) -> Union[None, Task]:
@@ -46,7 +50,11 @@ class TaskRepository(ITaskRepository):
                 method='GET',
                 pathname=pathname,
             )
-            task = response.json()['task']
+            response = response.json()
+            if response['status'] == 'failure':
+                raise TaskRepositoryError(response['error']['message'])
+
+            task = response['result']
             if not task:
                 return None
             brief = self.enigma_machine.decrypt(task['brief'])
@@ -67,7 +75,11 @@ class TaskRepository(ITaskRepository):
             method='GET',
             pathname='/task',
         )
-        tasks = response.json()['tasks']
+        response = response.json()
+        if response['status'] == 'failure':
+            raise TaskRepositoryError(response['error']['message'])
+
+        tasks = response['result']
         return [Task.new(
             brief=self.enigma_machine.decrypt(task['brief']),
             id_=task['id'],

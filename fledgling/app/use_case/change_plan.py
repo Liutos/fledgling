@@ -54,8 +54,6 @@ class ChangePlanUseCase:
         if found:
             plan.visible_hours = visible_hours
         found, visible_wdays = params.get_visible_wdays()
-        print('found', found)
-        print('visible_wdays', visible_wdays)
         if found:
             plan.visible_wdays = visible_wdays
 
