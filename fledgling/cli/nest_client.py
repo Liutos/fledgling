@@ -29,12 +29,13 @@ class NestClient(INestGateway):
         self.cookies = response.cookies
 
     def request(self, *, pathname, **kwargs):
+        url = '{}{}'.format(self.url_prefix, pathname)
         try:
             return request(
                 cookies=self.cookies,
-                url='{}{}'.format(self.url_prefix, pathname),
+                url=url,
                 **kwargs
             )
         except ConnectionError as e:
-            logging.warning('请求{}失败：{}'.format(kwargs['url'], str(e)))
+            logging.warning('请求{}失败：{}'.format(url, str(e)))
             raise NetworkError()
