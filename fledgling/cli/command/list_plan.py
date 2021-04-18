@@ -34,10 +34,11 @@ class Presenter:
                 plan.task.brief,
                 plan.repeat_type,
                 '是' if plan.is_visible(trigger_time=now) else '否',
+                plan.duration if isinstance(plan.duration, int) and plan.duration > 0 else '-',
             ]
             table.append(row)
         print(tabulate(
-            headers=['计划ID', '计划时间', '任务简述', '重复类型', '是否可见'],
+            headers=['计划ID', '计划时间', '任务简述', '重复类型', '是否可见', '展示时长'],
             tabular_data=table,
         ))
 

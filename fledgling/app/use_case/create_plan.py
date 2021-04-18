@@ -1,11 +1,15 @@
 # -*- coding: utf8 -*-
 from abc import ABC, abstractmethod
-from typing import Set
+from typing import Set, Union
 
 from fledgling.app.entity.plan import IPlanRepository, Plan
 
 
 class IParams(ABC):
+    @abstractmethod
+    def get_duration(self) -> Union[None, int]:
+        pass
+
     @abstractmethod
     def get_repeat_type(self) -> str:
         pass
@@ -36,12 +40,14 @@ class CreatePlanUseCase:
 
     def run(self):
         params = self.params
+        duration = params.get_duration()
         repeat_type = params.get_repeat_type()
         task_id = params.get_task_id()
         trigger_time = params.get_trigger_time()
         visible_hours = params.get_visible_hours()
         visible_wdays = params.get_visible_wdays()
         plan = Plan.new(
+            duration=duration,
             repeat_type=repeat_type,
             task_id=task_id,
             trigger_time=trigger_time,

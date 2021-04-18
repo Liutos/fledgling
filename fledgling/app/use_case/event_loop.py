@@ -32,7 +32,7 @@ class AlertState:
 
     def is_expired(self):
         now = time.time()
-        return now - self.birth_time > self.plan.duration
+        return isinstance(self.plan.duration, int) and now - self.birth_time > self.plan.duration
 
     def terminate(self):
         pid = self.process.pid

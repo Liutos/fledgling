@@ -10,7 +10,7 @@ class PlanRepositoryError(Exception):
 
 class Plan:
     def __init__(self):
-        self.duration = 60
+        self.duration = None
         self.id = None
         self.repeat_type = None
         self.task = None
@@ -20,8 +20,10 @@ class Plan:
         self.visible_wdays = set([])
 
     @classmethod
-    def new(cls, *, id_=None, repeat_type=None, task_id, trigger_time, visible_hours=None, visible_wdays=None):
+    def new(cls, *, duration: Union[None, int] = None,
+            id_=None, repeat_type=None, task_id, trigger_time, visible_hours=None, visible_wdays=None):
         instance = Plan()
+        instance.duration = duration
         instance.id = id_
         instance.repeat_type = repeat_type
         instance.task_id = task_id

@@ -11,6 +11,10 @@ class PlanNotFoundError(Exception):
 
 class IParams(ABC):
     @abstractmethod
+    def get_duration(self) -> Tuple[bool, Union[None, int]]:
+        pass
+
+    @abstractmethod
     def get_plan_id(self) -> int:
         pass
 
@@ -44,6 +48,9 @@ class ChangePlanUseCase:
         if plan is None:
             raise PlanNotFoundError()
 
+        found, duration = params.get_duration()
+        if found:
+            plan.duration = duration
         found, repeat_type = params.get_repeat_type()
         if found:
             plan.repeat_type = repeat_type

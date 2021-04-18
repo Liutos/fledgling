@@ -8,14 +8,19 @@ from fledgling.cli.repository_factory import RepositoryFactory
 
 
 class Params(IParams):
-    def __init__(self, *, repeat_type=None, task_id, trigger_time,
+    def __init__(self, *, duration: Union[None, int] = None,
+                 repeat_type=None, task_id, trigger_time,
                  visible_hours: Union[None, List[int]] = None,
                  visible_wdays: Union[None, List[int]] = None):
+        self.duration = duration
         self.repeat_type = repeat_type
         self.task_id = task_id
         self.trigger_time = trigger_time
         self.visible_hours = set(visible_hours or [])
         self.visible_wdays = set(visible_wdays or [])
+
+    def get_duration(self) -> Union[None, int]:
+        return self.duration
 
     def get_repeat_type(self) -> str:
         return self.repeat_type
@@ -41,12 +46,14 @@ def validate_visible_hours(ctx, param, value: Union[None, str]):
 
 
 @click.command()
+@click.option('--duration', type=click.INT)
 @click.option('--repeat-type', type=click.STRING)
 @click.option('--task-id', required=True, type=click.INT)
 @click.option('--trigger-time', required=True, type=str)
 @click.option('--visible-hours', callback=validate_visible_hours, type=click.STRING)
 @click.option('--visible-wdays', callback=validate_visible_hours, type=click.STRING)
-def create_plan(repeat_type, task_id, trigger_time, visible_hours, visible_wdays):
+def create_plan(duration,
+                repeat_type, task_id, trigger_time, visible_hours, visible_wdays):
     """
     为任务创建一个计划。
     """
@@ -57,6 +64,7 @@ def create_plan(repeat_type, task_id, trigger_time, visible_hours, visible_wdays
     )
     use_case = CreatePlanUseCase(
         params=Params(
+            duration=duration,
             repeat_type=repeat_type,
             task_id=task_id,
             trigger_time=trigger_time,
