@@ -67,15 +67,7 @@ class PlanRepository(IPlanRepository):
         result = response['result']
         if result is None:
             return None
-        # TODO: 统一get/list方法中将HTTP响应结果转换为Plan实例的代码。
-        plan = Plan()
-        plan.duration = result['duration']
-        plan.id = result['id']
-        plan.task_id = result['task_id']
-        plan.trigger_time = result['trigger_time']
-        plan.visible_hours = set(result['visible_hours'])
-        plan.visible_wdays = set(result['visible_wdays'])
-        return plan
+        return self._dto_to_entity(result)
 
     def list(self, *, page, per_page):
         params = {
@@ -92,15 +84,7 @@ class PlanRepository(IPlanRepository):
             raise PlanRepositoryError(response['error']['message'])
 
         plans = response['result']
-        return [Plan.new(
-            duration=plan['duration'],
-            id_=plan['id'],
-            repeat_type=plan['repeat_type'],
-            task_id=plan['task_id'],
-            trigger_time=plan['trigger_time'],
-            visible_hours=set(plan['visible_hours']),
-            visible_wdays=set(plan['visible_wdays']),
-        ) for plan in plans]
+        return [self._dto_to_entity(plan) for plan in plans]
 
     def pop(self):
         json = {
@@ -137,3 +121,14 @@ class PlanRepository(IPlanRepository):
         response = response.json()
         if response['status'] == 'failure':
             raise PlanRepositoryError(response['error']['message'])
+
+    def _dto_to_entity(self, dto: dict) -> Plan:
+        plan = Plan()
+        plan.duration = dto['duration']
+        plan.id = dto['id']
+        plan.repeat_type = dto['repeat_type']
+        plan.task_id = dto['task_id']
+        plan.trigger_time = dto['trigger_time']
+        plan.visible_hours = set(dto['visible_hours'])
+        plan.visible_wdays = set(dto['visible_wdays'])
+        return plan
