@@ -11,7 +11,7 @@ class Alerter(IAlerter):
         args: List[str] = []
         args.append('alerter')
         args.append('-title')
-        args.append(task.brief)
+        args.append('#{} {}'.format(task.id, task.brief))
         args.append('-sound')
         args.append('default')
         if isinstance(plan.duration, int) and plan.duration > 0:
