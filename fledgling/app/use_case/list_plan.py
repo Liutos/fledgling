@@ -31,9 +31,15 @@ class ListPlanUseCase:
             page=page,
             per_page=per_page,
         )
+        task_ids = [plan.task_id for plan in plans]
+        tasks = self.task_repository.list(
+            page=1,
+            per_page=len(task_ids),
+            task_ids=task_ids,
+        )
         for plan in plans:
             task_id = plan.task_id
-            task = self.task_repository.get_by_id(task_id)
+            task = [task for task in tasks if task.id == task_id][0]
             plan.task = task
 
         return plans

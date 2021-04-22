@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 from abc import ABC, abstractmethod
-from typing import Union
+from typing import List, Union
 
 from fledgling.app.entity.task import (
     ITaskRepository,
@@ -65,11 +65,15 @@ class TaskRepository(ITaskRepository):
         except NetworkError:
             raise TaskRepositoryError()
 
-    def list(self, *, page, per_page):
+    def list(self, *, page, per_page,
+             task_ids: Union[None, List[int]] = None):
         params = {
             'page': page,
             'per_page': per_page,
         }
+        if task_ids is not None:
+            params['task_ids'] = ','.join([str(task_id) for task_id in task_ids])
+
         response = self.nest_client.request(
             params=params,
             method='GET',
