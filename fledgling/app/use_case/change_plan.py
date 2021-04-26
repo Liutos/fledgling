@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 from abc import ABC, abstractmethod
+from datetime import timedelta
 from typing import Set, Tuple, Union
 
 from fledgling.app.entity.plan import IPlanRepository
@@ -12,6 +13,10 @@ class PlanNotFoundError(Exception):
 class IParams(ABC):
     @abstractmethod
     def get_duration(self) -> Tuple[bool, Union[None, int]]:
+        pass
+
+    @abstractmethod
+    def get_repeat_interval(self) -> Tuple[bool, Union[None, timedelta]]:
         pass
 
     @abstractmethod
@@ -51,6 +56,9 @@ class ChangePlanUseCase:
         found, duration = params.get_duration()
         if found:
             plan.duration = duration
+        found, repeat_interval = params.get_repeat_interval()
+        if found:
+            plan.repeat_interval = repeat_interval
         found, repeat_type = params.get_repeat_type()
         if found:
             plan.repeat_type = repeat_type

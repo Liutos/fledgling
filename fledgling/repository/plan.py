@@ -1,4 +1,7 @@
 # -*- coding: utf8 -*-
+from datetime import timedelta
+from typing import Union
+
 from fledgling.app.entity.plan import (
     IPlanRepository,
     Plan,
@@ -14,8 +17,10 @@ class PlanRepository(IPlanRepository):
 
     def add(self, plan: Plan) -> Plan:
         if plan.id is None:
+            repeat_interval: Union[None, timedelta] = plan.repeat_interval
             json = {
                 'duration': plan.duration,
+                'repeat_interval': repeat_interval and repeat_interval.total_seconds(),
                 'repeat_type': plan.repeat_type,
                 'task_id': plan.task_id,
                 'trigger_time': plan.trigger_time,
@@ -35,8 +40,10 @@ class PlanRepository(IPlanRepository):
             plan.id = id_
             return plan
         else:
+            repeat_interval: Union[None, timedelta] = plan.repeat_interval
             json = {
                 'duration': plan.duration,
+                'repeat_interval': repeat_interval and repeat_interval.total_seconds(),
                 'repeat_type': plan.repeat_type,
                 'trigger_time': plan.trigger_time,
                 'visible_hours': list(plan.visible_hours),
@@ -126,6 +133,8 @@ class PlanRepository(IPlanRepository):
         plan = Plan()
         plan.duration = dto['duration']
         plan.id = dto['id']
+        if isinstance(dto.get('repeat_interval'), int):
+            plan.repeat_interval = timedelta(seconds=dto.get('repeat_interval'))
         plan.repeat_type = dto['repeat_type']
         plan.task_id = dto['task_id']
         plan.trigger_time = dto['trigger_time']

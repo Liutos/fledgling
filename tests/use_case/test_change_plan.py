@@ -1,4 +1,5 @@
 # -*- coding: utf8 -*-
+from datetime import timedelta
 from typing import Set, Tuple, Union
 
 from fledgling.app.use_case.change_plan import (
@@ -53,6 +54,9 @@ class MockParams(IParams):
 
     def get_plan_id(self) -> int:
         return 233
+
+    def get_repeat_interval(self) -> Tuple[bool, Union[None, timedelta]]:
+        return False, None
 
     def get_repeat_type(self) -> Tuple[bool, Union[None, str]]:
         return False, None
