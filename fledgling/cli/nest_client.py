@@ -1,5 +1,7 @@
 # -*- coding: utf8 -*-
 import logging
+from os.path import isfile
+import pickle
 
 from requests import (
     ConnectionError,
@@ -13,8 +15,16 @@ from fledgling.repository.nest_gateway import (
 
 
 class NestClient(INestGateway):
-    def __init__(self, *, hostname, port, protocol):
-        self.cookies = None
+    def __init__(self, *, email: str, cookies_path, hostname, password: str, port, protocol):
+        self.cookies_path = cookies_path
+        if cookies_path and isfile(cookies_path):
+            with open(cookies_path, 'br') as file:
+                self.cookies = pickle.load(file)
+                print('从文件{}中读入上一次的Cookies'.format(cookies_path))
+        else:
+            self.cookies = None
+        self.email = email
+        self.password = password
         self.url_prefix = '{}://{}:{}'.format(protocol, hostname, port)
 
     def login(self, *, email, password):
@@ -26,9 +36,20 @@ class NestClient(INestGateway):
             method='POST',
             url='{}/user/login'.format(self.url_prefix),
         )
-        self.cookies = response.cookies
+        cookies = response.cookies
+        with open(self.cookies_path, 'bw') as file:
+            pickle.dump(cookies, file)
+            print('将Cookies写入到文件中。')
+
+        self.cookies = cookies
 
     def request(self, *, pathname, **kwargs):
+        if not self.cookies:
+            self.login(
+                email=self.email,
+                password=self.password,
+            )
+
         url = '{}{}'.format(self.url_prefix, pathname)
         try:
             return request(

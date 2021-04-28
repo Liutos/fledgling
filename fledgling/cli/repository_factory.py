@@ -40,17 +40,17 @@ class RepositoryFactory:
         hostname = nest_section['hostname']
         port = nest_section['port']
         protocol = nest_section['protocol']
-        nest_client = NestClient(
-            hostname=hostname,
-            port=port,
-            protocol=protocol,
-        )
+        cookies_path = nest_section['cookies_path']
         account_section = config['account']
         email = account_section['email']
         password = account_section['password']
-        nest_client.login(
+        nest_client = NestClient(
+            cookies_path=cookies_path,
             email=email,
+            hostname=hostname,
             password=password,
+            port=port,
+            protocol=protocol,
         )
         self.nest_client = nest_client
 
