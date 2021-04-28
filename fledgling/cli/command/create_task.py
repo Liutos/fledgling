@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 import click
+from tabulate import tabulate
 
 from fledgling.app.use_case.create_task import CreateTaskUseCase, IParams
 from fledgling.cli.config import IniFileConfig
@@ -15,7 +16,7 @@ class Params(IParams):
 
 
 @click.command()
-@click.option('--brief', required=True, type=str)
+@click.option('--brief', help='任务简述', required=True, type=str)
 def create_task(*, brief):
     """
     创建一个任务。
@@ -33,4 +34,8 @@ def create_task(*, brief):
         params=params,
         task_repository=task_repository,
     )
-    use_case.run()
+    task = use_case.run()
+    click.echo(tabulate(
+        headers=['任务ID', '任务简述'],
+        tabular_data=[[task.id, task.brief]],
+    ))
