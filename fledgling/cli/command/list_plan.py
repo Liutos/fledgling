@@ -35,10 +35,11 @@ class Presenter:
                 plan.repeat_type,
                 '是' if plan.is_visible(trigger_time=now) else '否',
                 plan.duration if isinstance(plan.duration, int) and plan.duration > 0 else '-',
+                plan.location.name,
             ]
             table.append(row)
         print(tabulate(
-            headers=['计划ID', '计划时间', '任务简述', '重复类型', '是否可见', '展示时长'],
+            headers=['计划ID', '计划时间', '任务简述', '重复类型', '是否可见', '展示时长', '地点'],
             tabular_data=table,
         ))
 
@@ -56,6 +57,7 @@ def list_plan(*, page, per_page):
         config=config,
     )
     use_case = ListPlanUseCase(
+        location_repository=repository_factory.for_location(),
         params=Params(
             page=page,
             per_page=per_page,

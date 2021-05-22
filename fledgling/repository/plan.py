@@ -115,6 +115,7 @@ class PlanRepository(IPlanRepository):
             return None
         return Plan.new(
             duration=plans[0]['duration'],
+            location_id=plans[0]['location_id'],
             task_id=plans[0]['task_id'],
             trigger_time=plans[0]['trigger_time'],
         )
@@ -133,6 +134,7 @@ class PlanRepository(IPlanRepository):
         plan = Plan()
         plan.duration = dto['duration']
         plan.id = dto['id']
+        plan.location_id = dto['location_id']
         if isinstance(dto.get('repeat_interval'), int):
             plan.repeat_interval = timedelta(seconds=dto.get('repeat_interval'))
         plan.repeat_type = dto['repeat_type']

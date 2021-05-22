@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 
 from fledgling.cli.enigma_machine import FernetEnigmaMachine
 from fledgling.cli.nest_client import NestClient
+from fledgling.repository.location import NestLocationRepository
 from fledgling.repository.plan import PlanRepository
 from fledgling.repository.task import TaskRepository
 
@@ -53,6 +54,11 @@ class RepositoryFactory:
             protocol=protocol,
         )
         self.nest_client = nest_client
+
+    def for_location(self):
+        return NestLocationRepository(
+            nest_client=self.nest_client,
+        )
 
     def for_plan(self):
         return PlanRepository(
