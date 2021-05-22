@@ -16,6 +16,10 @@ class IParams(ABC):
         pass
 
     @abstractmethod
+    def get_location_id(self) -> Tuple[bool, Union[None, int]]:
+        pass
+
+    @abstractmethod
     def get_repeat_interval(self) -> Tuple[bool, Union[None, timedelta]]:
         pass
 
@@ -56,6 +60,9 @@ class ChangePlanUseCase:
         found, duration = params.get_duration()
         if found:
             plan.duration = duration
+        found, location_id = params.get_location_id()
+        if found:
+            plan.location_id = location_id
         found, repeat_interval = params.get_repeat_interval()
         if found:
             plan.repeat_interval = repeat_interval

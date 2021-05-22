@@ -20,6 +20,7 @@ class PlanRepository(IPlanRepository):
             repeat_interval: Union[None, timedelta] = plan.repeat_interval
             json = {
                 'duration': plan.duration,
+                'location_id': plan.location_id,
                 'repeat_interval': repeat_interval and repeat_interval.total_seconds(),
                 'repeat_type': plan.repeat_type,
                 'task_id': plan.task_id,
@@ -41,9 +42,13 @@ class PlanRepository(IPlanRepository):
             return plan
         else:
             repeat_interval: Union[None, timedelta] = plan.repeat_interval
+            seconds = None
+            if repeat_interval is not None:
+                seconds = int(repeat_interval.total_seconds())
             json = {
                 'duration': plan.duration,
-                'repeat_interval': repeat_interval and repeat_interval.total_seconds(),
+                'location_id': plan.location_id,
+                'repeat_interval': seconds,
                 'repeat_type': plan.repeat_type,
                 'trigger_time': plan.trigger_time,
                 'visible_hours': list(plan.visible_hours),

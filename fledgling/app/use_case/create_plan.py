@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 from abc import ABC, abstractmethod
 from datetime import timedelta
-from typing import Set, Union
+from typing import Optional, Set, Union
 
 from fledgling.app.entity.plan import IPlanRepository, Plan
 
@@ -9,6 +9,10 @@ from fledgling.app.entity.plan import IPlanRepository, Plan
 class IParams(ABC):
     @abstractmethod
     def get_duration(self) -> Union[None, int]:
+        pass
+
+    @abstractmethod
+    def get_location_id(self) -> Optional[int]:
         pass
 
     @abstractmethod
@@ -46,6 +50,7 @@ class CreatePlanUseCase:
     def run(self):
         params = self.params
         duration = params.get_duration()
+        location_id = params.get_location_id()
         repeat_interval = params.get_repeat_interval()
         repeat_type = params.get_repeat_type()
         task_id = params.get_task_id()
@@ -54,6 +59,7 @@ class CreatePlanUseCase:
         visible_wdays = params.get_visible_wdays()
         plan = Plan.new(
             duration=duration,
+            location_id=location_id,
             repeat_interval=repeat_interval,
             repeat_type=repeat_type,
             task_id=task_id,
