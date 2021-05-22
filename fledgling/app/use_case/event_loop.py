@@ -3,7 +3,9 @@ from abc import ABC, abstractmethod
 import logging
 import subprocess
 import time
+from typing import Optional
 
+from fledgling.app.entity.location import ILocationRepository
 from fledgling.app.entity.plan import (
     IPlanRepository,
     Plan,
@@ -24,6 +26,12 @@ class IAlerter(ABC):
         pass
 
 
+class IParams(ABC):
+    @abstractmethod
+    def get_location_name(self) -> Optional[str]:
+        pass
+
+
 class AlertState:
     def __init__(self, *, plan: Plan, process: subprocess.Popen):
         self.birth_time = time.time()
@@ -40,20 +48,37 @@ class AlertState:
         self.process.terminate()
 
 
+class InvalidLocationError(Exception):
+    def __init__(self, *, name: str):
+        self.name = name
+
+
 class EventLoopUseCase:
-    def __init__(self, *, alerter, plan_repository, task_repository):
+    def __init__(self, *, alerter, location_repository: ILocationRepository,
+                 params: IParams, plan_repository, task_repository):
         assert isinstance(alerter, IAlerter)
         assert isinstance(plan_repository, IPlanRepository)
         assert isinstance(task_repository, ITaskRepository)
         self.alerter = alerter
         self.alerts = []
+        self.location_repository = location_repository
+        self.params = params
         self.plan_repository = plan_repository
         self.task_repository = task_repository
 
     def run(self):
+        params = self.params
+        location_id = None
+        location_name = params.get_location_name()
+        if location_name is not None:
+            locations = self.location_repository.find(name=location_name)
+            if len(locations) == 0:
+                raise InvalidLocationError(name=location_name)
+            location_id = locations[0].id
+
         while True:
             try:
-                plan = self.plan_repository.pop()
+                plan = self.plan_repository.pop(location_id=location_id)
                 if plan:
                     task_id = plan.task_id
                     task = self.task_repository.get_by_id(task_id)

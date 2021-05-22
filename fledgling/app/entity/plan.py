@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
-from typing import List, Union
+from typing import List, Optional, Union
 
 
 class PlanRepositoryError(Exception):
@@ -76,7 +76,7 @@ class IPlanRepository(ABC):
         pass
 
     @abstractmethod
-    def pop(self) -> Union[None, Plan]:
+    def pop(self, *, location_id: Optional[int] = None) -> Union[None, Plan]:
         """
         获取一个当前能处理的计划，并且之后不再获取到它。
         """

@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 from datetime import timedelta
-from typing import Union
+from typing import Optional, Union
 
 from fledgling.app.entity.plan import (
     IPlanRepository,
@@ -93,10 +93,12 @@ class PlanRepository(IPlanRepository):
         plans = response['result']
         return [self._dto_to_entity(plan) for plan in plans]
 
-    def pop(self):
+    def pop(self, *, location_id: Optional[int] = None):
         json = {
             'size': 1,
         }
+        if location_id:
+            json['location_id'] = location_id
         try:
             response = self.nest_client.request(
                 json=json,

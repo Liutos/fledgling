@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 from abc import ABC, abstractmethod
-from typing import Union
+from typing import List, Optional, Union
 
 
 class Location:
@@ -21,6 +21,10 @@ class Location:
 class ILocationRepository(ABC):
     @abstractmethod
     def get(self, *, id_: int) -> Union[None, Location]:
+        pass
+
+    @abstractmethod
+    def find(self, *, name: Optional[str] = None) -> List[Location]:
         pass
 
 

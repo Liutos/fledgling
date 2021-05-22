@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-from typing import Union
+from typing import List, Optional, Union
 
 from fledgling.app.entity.location import (
     ILocationRepository,
@@ -12,6 +12,27 @@ from fledgling.repository.nest_gateway import INestGateway
 class NestLocationRepository(ILocationRepository):
     def __init__(self, *, nest_client: INestGateway):
         self.nest_client = nest_client
+
+    def find(self, *, name: Optional[str] = None) -> List[Location]:
+        params = {
+            'page': 1,
+            'per_page': 1,
+        }
+        if name is not None:
+            params['name'] = name
+
+        pathname = '/location'
+        response = self.nest_client.request(
+            method='GET',
+            params=params,
+            pathname=pathname,
+        )
+        response = response.json()
+        if response['status'] == 'failure':
+            raise LocationRepositoryError(response['error']['message'])
+
+        result = response['result']
+        return [self._dto_to_entity(location) for location in result]
 
     def get(self, *, id_) -> Union[None, Location]:
         pathname = '/location/{}'.format(id_)
