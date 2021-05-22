@@ -13,11 +13,15 @@ class NestLocationRepository(ILocationRepository):
     def __init__(self, *, nest_client: INestGateway):
         self.nest_client = nest_client
 
-    def find(self, *, name: Optional[str] = None) -> List[Location]:
+    def find(self, *, ids: Optional[List[int]] = None, name: Optional[str] = None,
+             page: Optional[int] = 1,
+             per_page: Optional[int] = 1) -> List[Location]:
         params = {
-            'page': 1,
-            'per_page': 1,
+            'page': page,
+            'per_page': per_page,
         }
+        if ids is not None:
+            params['ids'] = ','.join(map(str, ids))
         if name is not None:
             params['name'] = name
 

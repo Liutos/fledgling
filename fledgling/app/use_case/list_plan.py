@@ -34,6 +34,12 @@ class ListPlanUseCase:
             page=page,
             per_page=per_page,
         )
+        location_ids = [plan.location_id for plan in plans]
+        locations = self.location_repository.find(
+            ids=location_ids,
+            page=1,
+            per_page=len(location_ids),
+        )
         task_ids = [plan.task_id for plan in plans]
         tasks = self.task_repository.list(
             page=1,
@@ -42,7 +48,7 @@ class ListPlanUseCase:
         )
         for plan in plans:
             location_id = plan.location_id
-            location = self.location_repository.get(id_=location_id)
+            location = [location for location in locations if location.id == location_id][0]
             plan.location = location
             task_id = plan.task_id
             task = [task for task in tasks if task.id == task_id][0]

@@ -24,7 +24,10 @@ class ILocationRepository(ABC):
         pass
 
     @abstractmethod
-    def find(self, *, name: Optional[str] = None) -> List[Location]:
+    def find(self, *, ids: Optional[List[int]] = None,
+             name: Optional[str] = None,
+             page: Optional[int] = 1,
+             per_page: Optional[int] = 1) -> List[Location]:
         pass
 
 
