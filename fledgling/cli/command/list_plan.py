@@ -32,7 +32,7 @@ class Presenter:
                 plan.id,
                 plan.trigger_time,
                 plan.task.brief,
-                plan.repeat_type,
+                plan.repeating_description,
                 '是' if plan.is_visible(trigger_time=now) else '否',
                 plan.duration if isinstance(plan.duration, int) and plan.duration > 0 else '-',
                 plan.location.name,

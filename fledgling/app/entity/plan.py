@@ -16,6 +16,7 @@ class Plan:
         self.location_id = None
         self.repeat_interval = None
         self.repeat_type = None
+        self.repeating_description: str = ''
         self.task = None
         self.task_id = None
         self.trigger_time = None
@@ -25,13 +26,16 @@ class Plan:
     @classmethod
     def new(cls, *, duration: Union[None, int] = None,
             id_=None, location_id: int, repeat_interval: Union[None, timedelta] = None,
-            repeat_type=None, task_id, trigger_time, visible_hours=None, visible_wdays=None):
+            repeat_type=None,
+            repeating_description: Union[None, str] = None,
+            task_id, trigger_time, visible_hours=None, visible_wdays=None):
         instance = Plan()
         instance.duration = duration
         instance.id = id_
         instance.location_id = location_id
         instance.repeat_interval = repeat_interval
         instance.repeat_type = repeat_type
+        instance.repeating_description = repeating_description
         instance.task_id = task_id
         instance.trigger_time = trigger_time
         instance.visible_hours = visible_hours

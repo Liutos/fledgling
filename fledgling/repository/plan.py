@@ -145,6 +145,7 @@ class PlanRepository(IPlanRepository):
         if isinstance(dto.get('repeat_interval'), int):
             plan.repeat_interval = timedelta(seconds=dto.get('repeat_interval'))
         plan.repeat_type = dto['repeat_type']
+        plan.repeating_description = dto['repeating_description']
         plan.task_id = dto['task_id']
         plan.trigger_time = dto['trigger_time']
         plan.visible_hours = set(dto['visible_hours'])
