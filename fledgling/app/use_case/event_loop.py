@@ -44,8 +44,12 @@ class AlertState:
 
     def terminate(self):
         pid = self.process.pid
-        print('杀死进程{}'.format(pid))
-        self.process.terminate()
+        try:
+            self.process.wait(timeout=1)
+            print('进程{}已退出'.format(pid))
+        except subprocess.TimeoutExpired:
+            self.process.terminate()
+            print('向进程{}发送SIGTERM信号'.format(pid))
 
 
 class InvalidLocationError(Exception):
