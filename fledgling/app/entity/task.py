@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 from abc import ABC, abstractmethod
-from typing import List, Union
+from typing import List, Optional, Union
 
 
 class TaskRepositoryError(Exception):
@@ -33,7 +33,7 @@ class ITaskRepository(ABC):
         pass
 
     @abstractmethod
-    def list(self, *, page, per_page,
+    def list(self, *, keyword: Optional[str] = None, page, per_page,
              task_ids: Union[None, List[int]] = None):
         """
         列出任务。
