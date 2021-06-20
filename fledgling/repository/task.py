@@ -32,6 +32,7 @@ class TaskRepository(ITaskRepository):
         response = self.nest_client.request(
             json={
                 'brief': crypted_brief,
+                'keywords': task.keywords,
             },
             method='POST',
             pathname='/task',
