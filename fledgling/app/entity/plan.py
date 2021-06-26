@@ -21,14 +21,19 @@ class Plan:
         self.task_id = None
         self.trigger_time = None
         self.visible_hours = set([])
+        self.visible_hours_description: str = ''
         self.visible_wdays = set([])
+        self.visible_wdays_description: str = ''
 
     @classmethod
     def new(cls, *, duration: Union[None, int] = None,
             id_=None, location_id: int, repeat_interval: Union[None, timedelta] = None,
             repeat_type=None,
             repeating_description: Union[None, str] = None,
-            task_id, trigger_time, visible_hours=None, visible_wdays=None):
+            task_id, trigger_time, visible_hours=None,
+            visible_hours_description: Optional[str] = None,
+            visible_wdays=None,
+            visible_wdays_description: Optional[str] = None):
         instance = Plan()
         instance.duration = duration
         instance.id = id_
@@ -39,7 +44,9 @@ class Plan:
         instance.task_id = task_id
         instance.trigger_time = trigger_time
         instance.visible_hours = visible_hours
+        instance.visible_hours_description = visible_hours_description
         instance.visible_wdays = visible_wdays
+        instance.visible_wdays_description = visible_wdays_description
         return instance
 
     def is_visible(self, *, trigger_time: datetime):

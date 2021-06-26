@@ -149,5 +149,7 @@ class PlanRepository(IPlanRepository):
         plan.task_id = dto['task_id']
         plan.trigger_time = dto['trigger_time']
         plan.visible_hours = set(dto['visible_hours'])
+        plan.visible_hours_description = dto['visible_hours_description']
         plan.visible_wdays = set(dto['visible_wdays'])
+        plan.visible_wdays_description = dto['visible_wdays_description']
         return plan
