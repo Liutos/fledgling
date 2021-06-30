@@ -41,3 +41,7 @@ class ITaskRepository(ABC):
         列出任务。
         """
         pass
+
+    @abstractmethod
+    def remove(self, *, task_id: int):
+        pass

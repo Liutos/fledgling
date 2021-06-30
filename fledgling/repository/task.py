@@ -91,3 +91,12 @@ class TaskRepository(ITaskRepository):
             brief=self.enigma_machine.decrypt(task['brief']),
             id_=task['id'],
         ) for task in tasks]
+
+    def remove(self, *, task_id: int):
+        response = self.nest_client.request(
+            method='DELETE',
+            pathname='/task/{}'.format(task_id),
+        )
+        response = response.json()
+        if response['status'] == 'failure':
+            raise TaskRepositoryError(response['error']['message'])
