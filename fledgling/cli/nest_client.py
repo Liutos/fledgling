@@ -1,4 +1,6 @@
 # -*- coding: utf8 -*-
+from datetime import datetime
+import json
 import logging
 from os.path import isfile
 import pickle
@@ -50,13 +52,83 @@ class NestClient(INestGateway):
                 password=self.password,
             )
 
+        started_date_time = datetime.now()
         url = '{}{}'.format(self.url_prefix, pathname)
         try:
-            return request(
+            response = request(
                 cookies=self.cookies,
                 url=url,
                 **kwargs
             )
+            query_string = []
+            for name, value in kwargs.get('params', {}).items():
+                query_string.append({
+                    'name': name,
+                    'value': str(value),
+                })
+            post_data = {}
+            req = response.request
+            post_data['mimeType'] = req.headers.get('Content-Type')
+            post_data['text'] = req.body
+            if isinstance(post_data['text'], bytes):
+                post_data['text'] = post_data['text'].decode('utf-8')
+            req_cookies = []
+            for k, v in self.cookies.items():
+                req_cookies.append({
+                    'name': k,
+                    'value': v,
+                })
+            req_headers = []
+            # TODO: 这种将dict转换为name-value对数组的功能可以提炼一下。
+            for k, v in req.headers.items():
+                req_headers.append({
+                    'name': k,
+                    'value': v,
+                })
+            content = {
+                'mimeType': response.headers['Content-Type'],
+                'size': response.headers['Content-Length'],
+                'text': response.text,
+            }
+
+            logging.debug(json.dumps({
+                'log': {
+                    'creator': {
+                        'name': 'fledgling',
+                    },
+                    'entries': [{
+                        'cache': {},
+                        'request': {
+                            'bodySize': 0,
+                            'cookies': req_cookies,
+                            'headers': req_headers,
+                            'headersSize': 0,
+                            'httpVersion': '',
+                            'method': kwargs['method'],
+                            'postData': post_data,
+                            'queryString': query_string,
+                            'url': url,
+                        },
+                        'response': {
+                            'bodySize': 0,
+                            'content': content,
+                            'cookies': [],
+                            'headers': {},
+                            'headersSize': 0,
+                            'httpVersion': '',
+                            'redirectUrl': '',
+                            'status': response.status_code,
+                            'statusText': response.raw.reason,
+                        },
+                        'serverIPAddress': '',
+                        'startedDateTime': started_date_time.isoformat(),
+                        'time': (datetime.now() - started_date_time).total_seconds(),
+                        'timings': {},
+                    }],
+                    'version': '',
+                }
+            }))
+            return response
         except ConnectionError as e:
             logging.warning('请求{}失败：{}'.format(url, str(e)))
             raise NetworkError()

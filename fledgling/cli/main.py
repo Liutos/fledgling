@@ -38,6 +38,8 @@ log_file = log_dir.joinpath('fledgling.log')
 logging.basicConfig(
     filename=str(log_file),
     format='%(levelname)s:%(asctime)s:%(message)s',
+    # TODO: 应当支持通过配置文件修改level。
+    level=logging.DEBUG,
 )
 
 
