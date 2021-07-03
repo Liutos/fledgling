@@ -30,7 +30,7 @@ class ListPlanUseCase:
     def run(self):
         page = self.params.get_page()
         per_page = self.params.get_per_page()
-        plans = self.plan_repository.list(
+        plans, count = self.plan_repository.list(
             page=page,
             per_page=per_page,
         )
@@ -54,4 +54,4 @@ class ListPlanUseCase:
             task = [task for task in tasks if task.id == task_id][0]
             plan.task = task
 
-        return plans
+        return plans, count

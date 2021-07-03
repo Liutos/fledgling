@@ -21,7 +21,8 @@ class Params(IParams):
 
 
 class Presenter:
-    def __init__(self, plans):
+    def __init__(self, plans, count: int):
+        self.count = count
         self.plans = plans
 
     def format(self):
@@ -44,6 +45,7 @@ class Presenter:
             headers=['计划ID', '计划时间', '任务简述', '重复类型', '是否可见', '展示时长', '地点', '几点可见', '周几可见'],
             tabular_data=table,
         ))
+        print('共计{}个计划'.format(self.count))
 
 
 @click.command()
@@ -67,6 +69,6 @@ def list_plan(*, page, per_page):
         plan_repository=repository_factory.for_plan(),
         task_repository=repository_factory.for_task(),
     )
-    plans = use_case.run()
-    presenter = Presenter(plans)
+    plans, count = use_case.run()
+    presenter = Presenter(plans, count)
     presenter.format()

@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 from datetime import timedelta
-from typing import Optional, Union
+from typing import List, Optional, Tuple, Union
 
 from fledgling.app.entity.plan import (
     IPlanRepository,
@@ -81,7 +81,7 @@ class PlanRepository(IPlanRepository):
             return None
         return self._dto_to_entity(result)
 
-    def list(self, *, page, per_page):
+    def list(self, *, page, per_page) -> Tuple[List[Plan], int]:
         params = {
             'page': page,
             'per_page': per_page,
@@ -95,8 +95,9 @@ class PlanRepository(IPlanRepository):
         if response['status'] == 'failure':
             raise PlanRepositoryError(response['error']['message'])
 
-        plans = response['result']
-        return [self._dto_to_entity(plan) for plan in plans]
+        count = response['result']['count']
+        plans = response['result']['plans']
+        return [self._dto_to_entity(plan) for plan in plans], count
 
     def pop(self, *, location_id: Optional[int] = None):
         json = {

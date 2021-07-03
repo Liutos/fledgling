@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
-from typing import List, Optional, Union
+from typing import List, Optional, Tuple, Union
 
 
 class PlanRepositoryError(Exception):
@@ -80,7 +80,7 @@ class IPlanRepository(ABC):
         pass
 
     @abstractmethod
-    def list(self, *, page, per_page) -> List[Plan]:
+    def list(self, *, page, per_page) -> Tuple[List[Plan], int]:
         """
         获取指定页码的计划。
         """
