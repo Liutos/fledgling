@@ -31,7 +31,7 @@ class Presenter:
         for plan in self.plans:
             row = [
                 plan.id,
-                plan.trigger_time,
+                self._format_trigger_time(plan.trigger_time),
                 plan.task.brief,
                 plan.repeating_description,
                 '是' if plan.is_visible(trigger_time=now) else '否',
@@ -47,6 +47,15 @@ class Presenter:
         ))
         print('共计{}个计划'.format(self.count))
 
+    def _format_trigger_time(self, trigger_time: datetime) -> str:
+        now = datetime.now()
+        if trigger_time.day == now.day:
+            return trigger_time.strftime('%H:%M:%S')
+        if trigger_time.month == now.month:
+            return trigger_time.strftime('%d %H:%M:%S')
+        if trigger_time.year == now.year:
+            return trigger_time.strftime('%m-%d %H:%M:%S')
+        return trigger_time.strftime('%Y-%m-%d %H:%M:%S')
 
 @click.command()
 @click.option('--page', default=1, type=click.INT)

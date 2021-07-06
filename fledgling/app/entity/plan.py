@@ -19,7 +19,7 @@ class Plan:
         self.repeating_description: str = ''
         self.task = None
         self.task_id = None
-        self.trigger_time = None
+        self.trigger_time: Optional[datetime] = None
         self.visible_hours = set([])
         self.visible_hours_description: str = ''
         self.visible_wdays = set([])
@@ -30,7 +30,7 @@ class Plan:
             id_=None, location_id: int, repeat_interval: Union[None, timedelta] = None,
             repeat_type=None,
             repeating_description: Union[None, str] = None,
-            task_id, trigger_time, visible_hours=None,
+            task_id, trigger_time: datetime, visible_hours=None,
             visible_hours_description: Optional[str] = None,
             visible_wdays=None,
             visible_wdays_description: Optional[str] = None):

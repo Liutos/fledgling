@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import List, Optional, Tuple, Union
 
 from fledgling.app.entity.plan import (
@@ -148,7 +148,7 @@ class PlanRepository(IPlanRepository):
         plan.repeat_type = dto['repeat_type']
         plan.repeating_description = dto['repeating_description']
         plan.task_id = dto['task_id']
-        plan.trigger_time = dto['trigger_time']
+        plan.trigger_time = datetime.strptime(dto['trigger_time'], '%Y-%m-%d %H:%M:%S')
         plan.visible_hours = set(dto['visible_hours'])
         plan.visible_hours_description = dto['visible_hours_description']
         plan.visible_wdays = set(dto['visible_wdays'])
