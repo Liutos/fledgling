@@ -17,17 +17,7 @@ class PlanRepository(IPlanRepository):
 
     def add(self, plan: Plan) -> Plan:
         if plan.id is None:
-            repeat_interval: Union[None, timedelta] = plan.repeat_interval
-            json = {
-                'duration': plan.duration,
-                'location_id': plan.location_id,
-                'repeat_interval': repeat_interval and repeat_interval.total_seconds(),
-                'repeat_type': plan.repeat_type,
-                'task_id': plan.task_id,
-                'trigger_time': plan.trigger_time,
-                'visible_hours': list(plan.visible_hours),
-                'visible_wdays': list(plan.visible_wdays),
-            }
+            json = self._entity_to_dto(plan)
             response = self.nest_client.request(
                 json=json,
                 method='POST',
@@ -41,19 +31,7 @@ class PlanRepository(IPlanRepository):
             plan.id = id_
             return plan
         else:
-            repeat_interval: Union[None, timedelta] = plan.repeat_interval
-            seconds = None
-            if repeat_interval is not None:
-                seconds = int(repeat_interval.total_seconds())
-            json = {
-                'duration': plan.duration,
-                'location_id': plan.location_id,
-                'repeat_interval': seconds,
-                'repeat_type': plan.repeat_type,
-                'trigger_time': plan.trigger_time,
-                'visible_hours': list(plan.visible_hours),
-                'visible_wdays': list(plan.visible_wdays),
-            }
+            json = self._entity_to_dto(plan)
             print('json', json)
             pathname = '/plan/{}'.format(plan.id)
             response = self.nest_client.request(
@@ -154,3 +132,18 @@ class PlanRepository(IPlanRepository):
         plan.visible_wdays = set(dto['visible_wdays'])
         plan.visible_wdays_description = dto['visible_wdays_description']
         return plan
+
+    def _entity_to_dto(self, plan: Plan) -> dict:
+        repeat_interval: Union[None, timedelta] = plan.repeat_interval
+        seconds = None
+        if repeat_interval is not None:
+            seconds = int(repeat_interval.total_seconds())
+        return {
+            'duration': plan.duration,
+            'location_id': plan.location_id,
+            'repeat_interval': seconds,
+            'repeat_type': plan.repeat_type,
+            'trigger_time': plan.trigger_time.strftime('%Y-%m-%d %H:%M:%S'),
+            'visible_hours': list(plan.visible_hours),
+            'visible_wdays': list(plan.visible_wdays),
+        }
