@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 import click
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import List, Optional, Set, Union
 
 from fledgling.app.use_case.create_plan import CreatePlanUseCase, IParams
@@ -13,7 +13,7 @@ class Params(IParams):
     def __init__(self, *, duration: Union[None, int] = None,
                  location_id: Optional[int] = None,
                  repeat_interval: Union[None, int] = None,
-                 repeat_type=None, task_id, trigger_time,
+                 repeat_type=None, task_id, trigger_time: str,
                  visible_hours: Union[None, List[int]] = None,
                  visible_wdays: Union[None, List[int]] = None):
         self.duration = duration
@@ -21,7 +21,7 @@ class Params(IParams):
         self.repeat_interval = repeat_interval
         self.repeat_type = repeat_type
         self.task_id = task_id
-        self.trigger_time = trigger_time
+        self.trigger_time = datetime.strptime(trigger_time, '%Y-%m-%d %H:%M:%S')
         self.visible_hours = set(visible_hours or [])
         self.visible_wdays = set(visible_wdays or [])
 
@@ -32,7 +32,9 @@ class Params(IParams):
         return self.location_id
 
     def get_repeat_interval(self) -> Union[None, timedelta]:
-        return isinstance(self.repeat_interval, int) and timedelta(seconds=self.repeat_interval)
+        if isinstance(self.repeat_interval, int):
+            return timedelta(seconds=self.repeat_interval)
+        return None
 
     def get_repeat_type(self) -> str:
         return self.repeat_type
@@ -40,7 +42,7 @@ class Params(IParams):
     def get_task_id(self) -> int:
         return self.task_id
 
-    def get_trigger_time(self) -> str:
+    def get_trigger_time(self) -> datetime:
         return self.trigger_time
 
     def get_visible_hours(self) -> Set[int]:

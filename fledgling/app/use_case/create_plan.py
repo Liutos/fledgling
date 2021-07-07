@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 from abc import ABC, abstractmethod
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Optional, Set, Union
 
 from fledgling.app.entity.plan import IPlanRepository, Plan
@@ -28,7 +28,7 @@ class IParams(ABC):
         pass
 
     @abstractmethod
-    def get_trigger_time(self) -> str:
+    def get_trigger_time(self) -> datetime:
         pass
 
     @abstractmethod

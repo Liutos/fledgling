@@ -18,6 +18,7 @@ class PlanRepository(IPlanRepository):
     def add(self, plan: Plan) -> Plan:
         if plan.id is None:
             json = self._entity_to_dto(plan)
+            json['task_id'] = plan.task_id
             response = self.nest_client.request(
                 json=json,
                 method='POST',
@@ -99,12 +100,7 @@ class PlanRepository(IPlanRepository):
         plans = response['result']
         if len(plans) == 0:
             return None
-        return Plan.new(
-            duration=plans[0]['duration'],
-            location_id=plans[0]['location_id'],
-            task_id=plans[0]['task_id'],
-            trigger_time=plans[0]['trigger_time'],
-        )
+        return self._dto_to_entity(plans[0])
 
     def remove(self, id_: int):
         url = '/plan/{}'.format(id_)
