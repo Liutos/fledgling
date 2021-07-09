@@ -31,5 +31,10 @@ class ILocationRepository(ABC):
         pass
 
 
+class InvalidLocationError(Exception):
+    def __init__(self, *, name: str):
+        self.name = name
+
+
 class LocationRepositoryError(Exception):
     pass

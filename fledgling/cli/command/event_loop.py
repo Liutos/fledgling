@@ -3,9 +3,9 @@ import click
 import daemon
 from typing import Optional
 
+from fledgling.app.entity.location import InvalidLocationError
 from fledgling.app.use_case.event_loop import (
     EventLoopUseCase,
-    InvalidLocationError,
     IParams,
 )
 from fledgling.cli.alerter import Alerter

@@ -5,7 +5,7 @@ import subprocess
 import time
 from typing import Optional
 
-from fledgling.app.entity.location import ILocationRepository
+from fledgling.app.entity.location import ILocationRepository, InvalidLocationError
 from fledgling.app.entity.plan import (
     IPlanRepository,
     Plan,
@@ -50,11 +50,6 @@ class AlertState:
         except subprocess.TimeoutExpired:
             self.process.terminate()
             print('向进程{}发送SIGTERM信号'.format(pid))
-
-
-class InvalidLocationError(Exception):
-    def __init__(self, *, name: str):
-        self.name = name
 
 
 class EventLoopUseCase:

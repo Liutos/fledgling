@@ -1,12 +1,16 @@
 # -*- coding: utf8 -*-
 from abc import ABC, abstractmethod
+from typing import Optional
 
-from fledgling.app.entity.location import ILocationRepository
+from fledgling.app.entity.location import ILocationRepository, InvalidLocationError
 from fledgling.app.entity.plan import IPlanRepository
 from fledgling.app.entity.task import ITaskRepository
 
 
 class IParams(ABC):
+    def get_location_name(self) -> Optional[str]:
+        raise NotImplementedError
+
     @abstractmethod
     def get_page(self) -> int:
         pass
@@ -28,12 +32,23 @@ class ListPlanUseCase:
         self.task_repository = task_repository
 
     def run(self):
+        location_id = None
+        location_name = self.params.get_location_name()
+        if location_name is not None:
+            locations = self.location_repository.find(name=location_name)
+            if len(locations) == 0:
+                raise InvalidLocationError(name=location_name)
+            location_id = locations[0].id
+
         page = self.params.get_page()
         per_page = self.params.get_per_page()
-        plans, count = self.plan_repository.list(
-            page=page,
-            per_page=per_page,
-        )
+        criteria = {
+            'page': page,
+            'per_page': per_page,
+        }
+        if location_id is not None:
+            criteria['location_id'] = location_id
+        plans, count = self.plan_repository.list(**criteria)
         location_ids = [plan.location_id for plan in plans]
         locations = self.location_repository.find(
             ids=location_ids,
