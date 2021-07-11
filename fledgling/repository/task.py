@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 from abc import ABC, abstractmethod
-from typing import List, Optional, Union
+from datetime import datetime
+from typing import List, Optional, Tuple, Union
 
 from fledgling.app.entity.task import (
     ITaskRepository,
@@ -67,6 +68,8 @@ class TaskRepository(ITaskRepository):
             raise TaskRepositoryError()
 
     def list(self, *, keyword: Optional[str] = None, page, per_page,
+             plan_trigger_time: Optional[Tuple[datetime, datetime]] = None,
+             status: Optional[int] = None,
              task_ids: Union[None, List[int]] = None):
         params = {
             'page': page,
@@ -74,6 +77,13 @@ class TaskRepository(ITaskRepository):
         }
         if keyword is not None:
             params['keyword'] = keyword
+        if plan_trigger_time:
+            params['plan_trigger_time'] = ','.join([
+                plan_trigger_time[0].strftime('%Y-%m-%d %H:%M:%S'),
+                plan_trigger_time[1].strftime('%Y-%m-%d %H:%M:%S'),
+            ])
+        if status:
+            params['status'] = status
         if task_ids is not None:
             params['task_ids'] = ','.join([str(task_id) for task_id in task_ids])
 

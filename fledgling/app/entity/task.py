@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 from abc import ABC, abstractmethod
-from typing import List, Optional, Union
+from datetime import datetime
+from typing import List, Optional, Tuple, Union
 
 
 class TaskRepositoryError(Exception):
@@ -36,6 +37,8 @@ class ITaskRepository(ABC):
 
     @abstractmethod
     def list(self, *, keyword: Optional[str] = None, page, per_page,
+             plan_trigger_time: Optional[Tuple[datetime, datetime]] = None,
+             status: Optional[int] = None,
              task_ids: Union[None, List[int]] = None):
         """
         列出任务。

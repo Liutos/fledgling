@@ -31,11 +31,15 @@ class MockNestClient(INestGateway):
                 'result': {
                     'duration': 0,
                     'id': 233,
+                    'location_id': None,
                     'repeat_type': 'hourly',
+                    'repeating_description': '',
                     'task_id': 634,
                     'trigger_time': '2021-04-21 23:19:00',
                     'visible_hours': [],
+                    'visible_hours_description': '',
                     'visible_wdays': [],
+                    'visible_wdays_description': '',
                 },
                 'status': 'success',
             })

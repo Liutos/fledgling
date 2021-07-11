@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from datetime import datetime
+from typing import List, Optional, Tuple
 
 from fledgling.app.entity.task import ITaskRepository, Task
 
@@ -17,6 +18,12 @@ class IParams(ABC):
     @abstractmethod
     def get_per_page(self) -> int:
         pass
+
+    def get_plan_trigger_time(self) -> Optional[Tuple[datetime, datetime]]:
+        raise NotImplementedError
+
+    def get_status(self) -> Optional[int]:
+        raise NotImplementedError
 
 
 class ListTaskUseCase:
@@ -35,4 +42,6 @@ class ListTaskUseCase:
             keyword=keyword,
             page=page,
             per_page=per_page,
+            plan_trigger_time=params.get_plan_trigger_time(),
+            status=params.get_status(),
         )
