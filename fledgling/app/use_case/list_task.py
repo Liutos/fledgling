@@ -26,22 +26,29 @@ class IParams(ABC):
         raise NotImplementedError
 
 
+class IPresenter(ABC):
+    def show_task(self, *, tasks: List[Task]):
+        raise NotImplementedError
+
+
 class ListTaskUseCase:
-    def __init__(self, *, params, task_repository):
+    def __init__(self, *, params, presenter: IPresenter, task_repository):
         assert isinstance(params, IParams)
         assert isinstance(task_repository, ITaskRepository)
         self.params = params
+        self.presenter = presenter
         self.task_repository = task_repository
 
-    def run(self) -> List[Task]:
+    def run(self):
         params = self.params
         keyword = params.get_keyword()
         page = params.get_page()
         per_page = params.get_per_page()
-        return self.task_repository.list(
+        tasks = self.task_repository.list(
             keyword=keyword,
             page=page,
             per_page=per_page,
             plan_trigger_time=params.get_plan_trigger_time(),
             status=params.get_status(),
         )
+        self.presenter.show_task(tasks=tasks)

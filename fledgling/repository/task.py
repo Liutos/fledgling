@@ -7,6 +7,7 @@ from fledgling.app.entity.task import (
     ITaskRepository,
     Task,
     TaskRepositoryError,
+    TaskStatus,
 )
 from fledgling.repository.nest_gateway import INestGateway, NetworkError
 
@@ -59,11 +60,7 @@ class TaskRepository(ITaskRepository):
             task = response['result']
             if not task:
                 return None
-            brief = self.enigma_machine.decrypt(task['brief'])
-            return Task.new(
-                brief=brief,
-                id_=task['id'],
-            )
+            return self._dto_to_entity(task)
         except NetworkError:
             raise TaskRepositoryError()
 
@@ -97,10 +94,7 @@ class TaskRepository(ITaskRepository):
             raise TaskRepositoryError(response['error']['message'])
 
         tasks = response['result']
-        return [Task.new(
-            brief=self.enigma_machine.decrypt(task['brief']),
-            id_=task['id'],
-        ) for task in tasks]
+        return [self._dto_to_entity(task) for task in tasks]
 
     def remove(self, *, task_id: int):
         response = self.nest_client.request(
@@ -110,3 +104,10 @@ class TaskRepository(ITaskRepository):
         response = response.json()
         if response['status'] == 'failure':
             raise TaskRepositoryError(response['error']['message'])
+
+    def _dto_to_entity(self, dto: dict):
+        return Task.new(
+            brief=self.enigma_machine.decrypt(dto['brief']),
+            id_=dto['id'],
+            status=TaskStatus(dto['status']),
+        )

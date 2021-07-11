@@ -1,11 +1,12 @@
 # -*- coding: utf8 -*-
 from datetime import datetime
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
 import click
 from tabulate import tabulate
 
-from fledgling.app.use_case.list_task import IParams, ListTaskUseCase
+from fledgling.app.entity.task import Task
+from fledgling.app.use_case.list_task import IParams, IPresenter, ListTaskUseCase
 from fledgling.cli.config import IniFileConfig
 from fledgling.cli.repository_factory import RepositoryFactory
 
@@ -42,6 +43,17 @@ class Params(IParams):
         return self.status
 
 
+class ConsolePresenter(IPresenter):
+    def show_task(self, *, tasks: List[Task]):
+        table = []
+        for task in tasks:
+            table.append([task.id, task.brief, '是' if task.is_finished() else '否'])
+        click.echo(tabulate(
+            headers=['任务ID', '任务简述', '是否已完成'],
+            tabular_data=table,
+        ))
+
+
 @click.command()
 @click.option('--keyword', help='过滤任务的关键字')
 @click.option('--page', default=1, show_default=True)
@@ -64,13 +76,7 @@ def list_task(*, keyword, page, per_page, plan_trigger_time, status):
     repository_factory = RepositoryFactory(config)
     use_case = ListTaskUseCase(
         params=params,
+        presenter=ConsolePresenter(),
         task_repository=repository_factory.for_task(),
     )
-    tasks = use_case.run()
-    table = []
-    for task in tasks:
-        table.append([task.id, task.brief])
-    click.echo(tabulate(
-        headers=['任务ID', '任务简述'],
-        tabular_data=table,
-    ))
+    use_case.run()
