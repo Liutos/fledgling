@@ -37,31 +37,34 @@ class Presenter:
         for plan in self.plans:
             row = [
                 plan.id,
-                self._format_trigger_time(plan.trigger_time),
+                self._format_trigger_time(plan.duration, plan.trigger_time),
                 plan.task.brief,
                 plan.repeating_description,
                 '是' if plan.is_visible(trigger_time=now) else '否',
-                plan.duration if isinstance(plan.duration, int) and plan.duration > 0 else '-',
                 plan.location.name,
                 plan.visible_hours_description,
                 plan.visible_wdays_description,
             ]
             table.append(row)
         print(tabulate(
-            headers=['计划ID', '计划时间', '任务简述', '重复类型', '是否可见', '展示时长', '地点', '几点可见', '周几可见'],
+            headers=['计划ID', '计划时间', '任务简述', '重复类型', '是否可见', '地点', '几点可见', '周几可见'],
             tabular_data=table,
         ))
         print('共计{}个计划'.format(self.count))
 
-    def _format_trigger_time(self, trigger_time: datetime) -> str:
+    def _format_trigger_time(self, duration: Optional[int], trigger_time: datetime) -> str:
+        format_ = '%Y-%m-%d %H:%M:%S'
         now = datetime.now()
         if trigger_time.day == now.day:
-            return trigger_time.strftime('%H:%M:%S')
-        if trigger_time.month == now.month:
-            return trigger_time.strftime('%d %H:%M:%S')
-        if trigger_time.year == now.year:
-            return trigger_time.strftime('%m-%d %H:%M:%S')
-        return trigger_time.strftime('%Y-%m-%d %H:%M:%S')
+            format_ = '%H:%M:%S'
+        elif trigger_time.month == now.month:
+            format_ = '%d %H:%M:%S'
+        elif trigger_time.year == now.year:
+            format_ = '%m-%d %H:%M:%S'
+        trigger_time_description = trigger_time.strftime(format_)
+        if duration is not None and duration > 0:
+            trigger_time_description += ' {}S'.format(duration)
+        return trigger_time_description
 
 
 @click.command()
