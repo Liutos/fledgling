@@ -60,7 +60,7 @@ class PlanRepository(IPlanRepository):
             return None
         return self._dto_to_entity(result)
 
-    def list(self, *, location_id: Optional[int], page, per_page) -> Tuple[List[Plan], int]:
+    def list(self, *, location_id: Optional[int] = None, page, per_page) -> Tuple[List[Plan], int]:
         params = {
             'page': page,
             'per_page': per_page,

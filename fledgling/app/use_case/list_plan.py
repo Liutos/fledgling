@@ -11,6 +11,9 @@ class IParams(ABC):
     def get_location_name(self) -> Optional[str]:
         raise NotImplementedError
 
+    def get_no_location(self) -> bool:
+        raise NotImplementedError
+
     @abstractmethod
     def get_page(self) -> int:
         pass
@@ -34,7 +37,8 @@ class ListPlanUseCase:
     def run(self):
         location_id = None
         location_name = self.params.get_location_name()
-        if location_name is not None:
+        no_location = self.params.get_no_location()
+        if not no_location and location_name is not None:
             locations = self.location_repository.find(name=location_name)
             if len(locations) == 0:
                 raise InvalidLocationError(name=location_name)
