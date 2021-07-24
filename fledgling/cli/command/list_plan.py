@@ -3,6 +3,8 @@ from datetime import datetime
 from typing import List, Optional
 
 import click
+import colored
+from colored import stylize
 from wcwidth import wcswidth
 
 from fledgling.app.use_case.list_plan import IParams, ListPlanUseCase
@@ -55,8 +57,12 @@ class Presenter:
         separator_row = ['-' * width for width in column_widths]
         self._print_row(column_widths, headers)
         self._print_row(column_widths, separator_row)
-        for row in table:
-            self._print_row(column_widths, row)
+        for i, row in enumerate(table):
+            if i % 2 == 0:
+                styles = [colored.bg('light_gray'), colored.fg('black')]
+            else:
+                styles = []
+            self._print_row(column_widths, row, styles=styles)
         print('共计{}个计划'.format(self.count))
 
     def _compute_column_widths(self, headers: List[str], table) -> List[int]:
@@ -85,19 +91,23 @@ class Presenter:
             trigger_time_description += ' {}S'.format(duration)
         return trigger_time_description
 
-    def _print_row(self, column_widths: List[int], row: list):
+    def _print_row(self, column_widths: List[int], row: list, *, styles=None):
         """打印一行。数字为右对齐，其余为左对齐。"""
+        columns = []
         for i, value in enumerate(row):
             if isinstance(value, int):
-                print(' {value:>{width}} '.format(
+                columns.append('{value:>{width}}'.format(
                     value=value,
                     width=column_widths[i]
-                ), end='')
+                ))
             else:
                 # 因为字符串中可能有宽字符，所以需要自己打印右侧的空格。
                 length = wcswidth(value)
-                print(' ' + value + ' ', end=''.join([' '] * (column_widths[i] - length)))
-        print('')
+                columns.append(value + ''.join([' '] * (column_widths[i] - length)))
+        row_text = ' ' + '  '.join(columns) + ' '
+        if styles:
+            row_text = stylize(row_text, styles)
+        print(row_text)
 
 
 @click.command()
