@@ -1,9 +1,9 @@
 # -*- coding: utf8 -*-
-from typing import Optional
+from datetime import datetime
+from typing import List, Optional
 
 import click
-from datetime import datetime
-from tabulate import tabulate
+from wcwidth import wcswidth
 
 from fledgling.app.use_case.list_plan import IParams, ListPlanUseCase
 from fledgling.cli.config import IniFileConfig
@@ -50,11 +50,26 @@ class Presenter:
                 plan.visible_wdays_description,
             ]
             table.append(row)
-        print(tabulate(
-            headers=['计划ID', '计划时间', '任务简述', '重复类型', '是否可见', '地点', '几点可见', '周几可见'],
-            tabular_data=table,
-        ))
+        headers = ['计划ID', '计划时间', '任务简述', '重复类型', '是否可见', '地点', '几点可见', '周几可见']
+        column_widths = self._compute_column_widths(headers, table)
+        separator_row = ['-' * width for width in column_widths]
+        self._print_row(column_widths, headers)
+        self._print_row(column_widths, separator_row)
+        for row in table:
+            self._print_row(column_widths, row)
         print('共计{}个计划'.format(self.count))
+
+    def _compute_column_widths(self, headers: List[str], table) -> List[int]:
+        column_widths = [wcswidth(header) for header in headers]
+        for row in table:
+            for i in range(0, len(column_widths)):
+                v = row[i]
+                if not isinstance(v, str):
+                    v = str(v)
+                length = wcswidth(v)
+                if length > column_widths[i]:
+                    column_widths[i] = length
+        return column_widths
 
     def _format_trigger_time(self, duration: Optional[int], trigger_time: datetime) -> str:
         format_ = '%Y-%m-%d %H:%M:%S'
@@ -69,6 +84,20 @@ class Presenter:
         if duration is not None and duration > 0:
             trigger_time_description += ' {}S'.format(duration)
         return trigger_time_description
+
+    def _print_row(self, column_widths: List[int], row: list):
+        """打印一行。数字为右对齐，其余为左对齐。"""
+        for i, value in enumerate(row):
+            if isinstance(value, int):
+                print(' {value:>{width}} '.format(
+                    value=value,
+                    width=column_widths[i]
+                ), end='')
+            else:
+                # 因为字符串中可能有宽字符，所以需要自己打印右侧的空格。
+                length = wcswidth(value)
+                print(' ' + value + ' ', end=''.join([' '] * (column_widths[i] - length)))
+        print('')
 
 
 @click.command()
