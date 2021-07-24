@@ -82,6 +82,10 @@ class Presenter:
         now = datetime.now()
         if trigger_time.day == now.day:
             format_ = '%H:%M:%S'
+        elif self._is_tomorrow(now, trigger_time):
+            format_ = '明天%H:%M:%S'
+        elif self._is_day_after_tomorrow(now, trigger_time):
+            format_ = '后天%H:%M:%S'
         elif trigger_time.month == now.month:
             format_ = '%d %H:%M:%S'
         elif trigger_time.year == now.year:
@@ -90,6 +94,12 @@ class Presenter:
         if duration is not None and duration > 0:
             trigger_time_description += 'P{}S'.format(duration)
         return trigger_time_description
+
+    def _is_day_after_tomorrow(self, now: datetime, trigger_time: datetime) -> bool:
+        return (trigger_time.date() - now.date()).days == 2
+
+    def _is_tomorrow(self, now: datetime, trigger_time: datetime) -> bool:
+        return (trigger_time.date() - now.date()).days == 1
 
     def _print_row(self, column_widths: List[int], row: list, *, styles=None):
         """打印一行。数字为右对齐，其余为左对齐。"""
