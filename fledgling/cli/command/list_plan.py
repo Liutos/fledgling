@@ -88,7 +88,7 @@ class Presenter:
             format_ = '%m-%d %H:%M:%S'
         trigger_time_description = trigger_time.strftime(format_)
         if duration is not None and duration > 0:
-            trigger_time_description += ' {}S'.format(duration)
+            trigger_time_description += 'P{}S'.format(duration)
         return trigger_time_description
 
     def _print_row(self, column_widths: List[int], row: list, *, styles=None):
