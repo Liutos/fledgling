@@ -7,7 +7,9 @@ import colored
 from colored import stylize
 from wcwidth import wcswidth
 
-from fledgling.app.use_case.list_plan import IParams, ListPlanUseCase
+from fledgling.app.entity.location import InvalidLocationError
+from fledgling.app.entity.plan import Plan
+from fledgling.app.use_case.list_plan import IParams, IPresenter, ListPlanUseCase
 from fledgling.cli.config import IniFileConfig
 from fledgling.cli.repository_factory import RepositoryFactory
 
@@ -32,12 +34,32 @@ class Params(IParams):
         return self.per_page
 
 
-class Presenter:
-    def __init__(self, plans, count: int):
+class ConsolePresenter(IPresenter):
+    def __init__(self):
+        self.count = 0
+        self.plans = []
+
+    def on_invalid_location(self, *, error: InvalidLocationError):
+        raise NotImplementedError
+
+    def show_plans(self, *, count: int, plans: List[Plan]):
         self.count = count
         self.plans = plans
+        self._format()
 
-    def format(self):
+    def _compute_column_widths(self, headers: List[str], table) -> List[int]:
+        column_widths = [wcswidth(header) for header in headers]
+        for row in table:
+            for i in range(0, len(column_widths)):
+                v = row[i]
+                if not isinstance(v, str):
+                    v = str(v)
+                length = wcswidth(v)
+                if length > column_widths[i]:
+                    column_widths[i] = length
+        return column_widths
+
+    def _format(self):
         table = []
         now = datetime.now()
         for plan in self.plans:
@@ -64,18 +86,6 @@ class Presenter:
                 styles = []
             self._print_row(column_widths, row, styles=styles)
         print('共计{}个计划'.format(self.count))
-
-    def _compute_column_widths(self, headers: List[str], table) -> List[int]:
-        column_widths = [wcswidth(header) for header in headers]
-        for row in table:
-            for i in range(0, len(column_widths)):
-                v = row[i]
-                if not isinstance(v, str):
-                    v = str(v)
-                length = wcswidth(v)
-                if length > column_widths[i]:
-                    column_widths[i] = length
-        return column_widths
 
     def _format_trigger_time(self, duration: Optional[int], trigger_time: datetime) -> str:
         format_ = '%Y-%m-%d %H:%M:%S'
@@ -142,8 +152,7 @@ def list_plan(*, no_location: bool, page, per_page):
             per_page=per_page,
         ),
         plan_repository=repository_factory.for_plan(),
+        presenter=ConsolePresenter(),
         task_repository=repository_factory.for_task(),
     )
-    plans, count = use_case.run()
-    presenter = Presenter(plans, count)
-    presenter.format()
+    use_case.run()
