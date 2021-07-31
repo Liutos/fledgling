@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 from datetime import datetime
+from time import sleep
 from typing import List, Optional
 
 import click
@@ -38,6 +39,14 @@ class ConsolePresenter(IPresenter):
     def __init__(self):
         self.count = 0
         self.plans = []
+
+    def on_find_location(self):
+        print('\r正在查找计划关联的地点', end='')
+        sleep(1)
+
+    def on_find_task(self):
+        print('\r正在查找计划关联的任务')
+        sleep(1)
 
     def on_invalid_location(self, *, error: InvalidLocationError):
         raise NotImplementedError

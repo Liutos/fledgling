@@ -25,6 +25,14 @@ class IParams(ABC):
 
 class IPresenter(ABC):
     @abstractmethod
+    def on_find_location(self):
+        pass
+
+    @abstractmethod
+    def on_find_task(self):
+        pass
+
+    @abstractmethod
     def on_invalid_location(self, *, error: InvalidLocationError):
         pass
 
@@ -69,12 +77,14 @@ class ListPlanUseCase:
             criteria['location_id'] = location_id
         plans, count = self.plan_repository.list(**criteria)
         location_ids = [plan.location_id for plan in plans]
+        self.presenter.on_find_location()
         locations = self.location_repository.find(
             ids=location_ids,
             page=1,
             per_page=len(location_ids),
         )
         task_ids = [plan.task_id for plan in plans]
+        self.presenter.on_find_task()
         tasks = self.task_repository.list(
             page=1,
             per_page=len(task_ids),
