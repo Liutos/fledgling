@@ -38,6 +38,9 @@ class NestClient(INestGateway):
             method='POST',
             url='{}/user/login'.format(self.url_prefix),
         )
+        # TODO: 展示 nest 返回的错误原因。
+        if response.status_code != 200:
+            raise Exception('登录失败')
         cookies = response.cookies
         with open(self.cookies_path, 'bw') as file:
             pickle.dump(cookies, file)
