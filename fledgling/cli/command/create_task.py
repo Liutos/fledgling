@@ -5,7 +5,6 @@ import click
 from tabulate import tabulate
 
 from fledgling.app.use_case.create_task import CreateTaskUseCase, IParams
-from fledgling.cli.config import IniFileConfig
 from fledgling.cli.repository_factory import RepositoryFactory
 
 
@@ -25,12 +24,12 @@ class Params(IParams):
 @click.command()
 @click.option('--brief', help='任务简述', required=True, type=str)
 @click.option('--keywords', default='', help='关键字', type=str)
-def create_task(*, brief, keywords):
+@click.pass_context
+def create_task(ctx: click.Context, *, brief, keywords):
     """
     创建一个任务。
     """
-    config = IniFileConfig()
-    config.load()
+    config = ctx.obj['config']
     params = Params(
         brief=brief,
         keywords=keywords,

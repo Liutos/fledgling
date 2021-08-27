@@ -5,7 +5,6 @@ from typing import List, Set, Tuple, Union
 import click
 
 from fledgling.app.use_case.change_plan import ChangePlanUseCase, IParams
-from fledgling.cli.config import IniFileConfig
 from fledgling.cli.repository_factory import RepositoryFactory
 
 
@@ -70,7 +69,8 @@ def validate_visible_hours(ctx, param, value: Union[None, str]):
 @click.option('--trigger-time', type=click.STRING)
 @click.option('--visible-hours', callback=validate_visible_hours, type=click.STRING)
 @click.option('--visible-wdays', callback=validate_visible_hours, type=click.STRING)
-def change_plan(*, duration, location_id,
+@click.pass_context
+def change_plan(ctx: click.Context, *, duration, location_id,
                 plan_id, repeat_interval, repeat_type, trigger_time, visible_hours, visible_wdays):
     """
     修改指定计划。
@@ -85,8 +85,7 @@ def change_plan(*, duration, location_id,
         visible_hours=visible_hours,
         visible_wdays=visible_wdays,
     )
-    config = IniFileConfig()
-    config.load()
+    config = ctx.obj['config']
     repository_factory = RepositoryFactory(config)
     use_case = ChangePlanUseCase(
         params=params,

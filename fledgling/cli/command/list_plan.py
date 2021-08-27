@@ -11,7 +11,6 @@ from wcwidth import wcswidth
 from fledgling.app.entity.location import InvalidLocationError
 from fledgling.app.entity.plan import Plan
 from fledgling.app.use_case.list_plan import IParams, IPresenter, ListPlanUseCase
-from fledgling.cli.config import IniFileConfig
 from fledgling.cli.repository_factory import RepositoryFactory
 
 
@@ -143,12 +142,12 @@ class ConsolePresenter(IPresenter):
 @click.option('--no-location', default=False, help='是否不按地点过滤', is_flag=True, show_default=True, type=click.BOOL)
 @click.option('--page', default=1, type=click.INT)
 @click.option('--per-page', default=10, type=click.INT)
-def list_plan(*, no_location: bool, page, per_page):
+@click.pass_context
+def list_plan(ctx: click.Context, *, no_location: bool, page, per_page):
     """
     列出接下来的计划。
     """
-    config = IniFileConfig()
-    config.load()
+    config = ctx.obj['config']
     repository_factory = RepositoryFactory(
         config=config,
     )

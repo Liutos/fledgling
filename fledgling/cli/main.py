@@ -14,8 +14,17 @@ from fledgling.cli.command.delete_task import delete_task
 from fledgling.cli.command.event_loop import event_loop
 from fledgling.cli.command.list_plan import list_plan
 from fledgling.cli.command.list_task import list_task
+from fledgling.cli.config import IniFileConfig
 
-cli = click.Group()
+
+@click.group()
+@click.pass_context
+def cli(ctx: click.Context):
+    config = IniFileConfig()
+    config.load()
+    ctx.ensure_object(dict)
+    ctx.obj['config'] = config
+
 
 cli.add_command(change_plan)
 cli.add_command(create_config)

@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 from typing import List, Optional, Set, Union
 
 from fledgling.app.use_case.create_plan import CreatePlanUseCase, IParams
-from fledgling.cli.config import IniFileConfig
 from fledgling.cli.repository_factory import RepositoryFactory
 
 
@@ -68,13 +67,13 @@ def validate_visible_hours(ctx, param, value: Union[None, str]):
 @click.option('--trigger-time', required=True, type=str)
 @click.option('--visible-hours', callback=validate_visible_hours, type=click.STRING)
 @click.option('--visible-wdays', callback=validate_visible_hours, type=click.STRING)
-def create_plan(duration, location_id: Optional[int],
+@click.pass_context
+def create_plan(ctx: click.Context, duration, location_id: Optional[int],
                 repeat_interval, repeat_type, task_id, trigger_time, visible_hours, visible_wdays):
     """
     为任务创建一个计划。
     """
-    config = IniFileConfig()
-    config.load()
+    config = ctx.obj['config']
     repository_factory = RepositoryFactory(
         config=config,
     )

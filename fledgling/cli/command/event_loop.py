@@ -23,12 +23,12 @@ class Params(IParams):
 
 @click.command()
 @click.option('--is-daemon', default=False, help='以守护进程运行', is_flag=True, type=click.BOOL)
-def event_loop(is_daemon: bool):
+@click.pass_context
+def event_loop(ctx: click.Context, is_daemon: bool):
     """
     启动事件循环拉取计划并弹出提醒。
     """
-    config = IniFileConfig()
-    config.load()
+    config = ctx.obj['config']
     repository_factory = RepositoryFactory(
         config=config,
     )

@@ -7,7 +7,6 @@ import click
 
 from fledgling.app.entity.task import Task
 from fledgling.app.use_case.delete_task import DeleteTaskUseCase, IParams, IPresenter
-from fledgling.cli.config import IniFileConfig
 from fledgling.cli.repository_factory import RepositoryFactory
 
 
@@ -53,13 +52,13 @@ class ConsolePresenter(IPresenter):
 
 @click.command()
 @click.option('--task-id', help='要删除的任务的ID', type=click.INT)
-def delete_task(*, task_id):
+@click.pass_context
+def delete_task(ctx: click.Context, *, task_id):
     """
     删除指定任务及其计划。
     """
     params = Params(task_id=task_id)
-    config = IniFileConfig()
-    config.load()
+    config = ctx.obj['config']
     repository_factory = RepositoryFactory(config)
     use_case = DeleteTaskUseCase(
         params=params,

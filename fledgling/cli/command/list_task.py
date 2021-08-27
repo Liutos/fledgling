@@ -7,7 +7,6 @@ from tabulate import tabulate
 
 from fledgling.app.entity.task import Task
 from fledgling.app.use_case.list_task import IParams, IPresenter, ListTaskUseCase
-from fledgling.cli.config import IniFileConfig
 from fledgling.cli.repository_factory import RepositoryFactory
 
 
@@ -60,7 +59,8 @@ class ConsolePresenter(IPresenter):
 @click.option('--per-page', default=10, show_default=True)
 @click.option('--plan-trigger-time', help='任务的计划触发时间范围', type=str)
 @click.option('--status', help='任务的状态', type=click.INT)
-def list_task(*, keyword, page, per_page, plan_trigger_time, status):
+@click.pass_context
+def list_task(ctx: click.Context, *, keyword, page, per_page, plan_trigger_time, status):
     """
     列出任务。
     """
@@ -71,8 +71,7 @@ def list_task(*, keyword, page, per_page, plan_trigger_time, status):
         plan_trigger_time=plan_trigger_time,
         status=status,
     )
-    config = IniFileConfig()
-    config.load()
+    config = ctx.obj['config']
     repository_factory = RepositoryFactory(config)
     use_case = ListTaskUseCase(
         params=params,
