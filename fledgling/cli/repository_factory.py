@@ -1,11 +1,13 @@
 # -*- coding: utf8 -*-
 from abc import ABC, abstractmethod
 
+from fledgling.app.entity.user import IUserRepository
 from fledgling.cli.enigma_machine import FernetEnigmaMachine
 from fledgling.cli.nest_client import NestClient
 from fledgling.repository.location import NestLocationRepository
 from fledgling.repository.plan import PlanRepository
 from fledgling.repository.task import TaskRepository
+from fledgling.repository.user import NestUserRepository
 
 
 class IConfig(ABC):
@@ -68,5 +70,10 @@ class RepositoryFactory:
     def for_task(self):
         return TaskRepository(
             enigma_machine=self.enigma_machine,
+            nest_client=self.nest_client,
+        )
+
+    def for_user(self) -> IUserRepository:
+        return NestUserRepository(
             nest_client=self.nest_client,
         )

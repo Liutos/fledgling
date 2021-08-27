@@ -38,6 +38,6 @@ def register(ctx: click.Context, email: str, nickname: str, password: str):
             nickname=nickname,
             password=password,
         ),
-        user_repository=repository_factory.for_plan(),
+        user_repository=repository_factory.for_user(),
     )
     use_case.run()
