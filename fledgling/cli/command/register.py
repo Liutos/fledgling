@@ -2,7 +2,6 @@
 import click
 
 from fledgling.app.use_case.create_user import CreateUserUseCase, IParams
-from fledgling.cli.config import IniFileConfig
 from fledgling.cli.repository_factory import RepositoryFactory
 
 
@@ -26,10 +25,10 @@ class Params(IParams):
 @click.option('--email', help='登录用的邮箱', required=True, type=click.STRING)
 @click.option('--nickname', help='昵称', required=True, type=click.STRING)
 @click.option('--password', help='登录所需的密码', required=True, type=click.STRING)
-def register(email: str, nickname: str, password: str):
+@click.pass_context
+def register(ctx: click.Context, email: str, nickname: str, password: str):
     """注册一个新用户。"""
-    config = IniFileConfig()
-    config.load()
+    config = ctx.obj['config']
     repository_factory = RepositoryFactory(
         config=config,
     )

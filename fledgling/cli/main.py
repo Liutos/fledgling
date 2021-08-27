@@ -1,4 +1,6 @@
 # -*- coding: utf8 -*-
+from typing import Optional
+
 import click
 import logging
 
@@ -18,9 +20,10 @@ from fledgling.cli.config import IniFileConfig
 
 
 @click.group()
+@click.option('--config-file', help='配置文件路径')
 @click.pass_context
-def cli(ctx: click.Context):
-    config = IniFileConfig()
+def cli(ctx: click.Context, *, config_file: Optional[str]):
+    config = IniFileConfig(config_file=config_file)
     config.load()
     ctx.ensure_object(dict)
     ctx.obj['config'] = config

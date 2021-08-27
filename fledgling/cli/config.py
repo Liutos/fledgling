@@ -1,6 +1,8 @@
 # -*- coding: utf8 -*-
+from typing import Optional
 import configparser
 import os
+import pathlib
 
 from xdg import xdg_config_home
 
@@ -11,9 +13,12 @@ class IniFileConfig(IConfig):
     """
     基于.ini文件的配置。
     """
-    def __init__(self):
+    def __init__(self, *, config_file: Optional[str] = None):
         config_dir = xdg_config_home().joinpath('fledgling')
-        config_file = config_dir.joinpath('config.ini')
+        if config_file is None:
+            config_file = config_dir.joinpath('config.ini')
+        if isinstance(config_file, str):
+            config_file = pathlib.Path(config_file)
         print('config_file', config_file)
         self.config = configparser.ConfigParser()
         self.config_dir = config_dir
