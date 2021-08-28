@@ -4,7 +4,7 @@ from fledgling.app.entity.user import (
     User,
     UserRepositoryError,
 )
-from fledgling.repository.nest_gateway import INestGateway
+from fledgling.gateway.nest_gateway import INestGateway
 
 
 class NestUserRepository(IUserRepository):

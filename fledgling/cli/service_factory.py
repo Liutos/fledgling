@@ -1,16 +1,14 @@
 # -*- coding: utf8 -*-
-from fledgling.app.entity.user import IUserRepository
+from fledgling.app.use_case.activate_user import IUserService
 from fledgling.cli.config import IConfig
 from fledgling.cli.enigma_machine import FernetEnigmaMachine
 from fledgling.cli.nest_client import NestClient
-from fledgling.repository.location import NestLocationRepository
-from fledgling.repository.plan import PlanRepository
-from fledgling.repository.task import TaskRepository
-from fledgling.repository.user import NestUserRepository
+from fledgling.service.user import NestUserService
 
 
-class RepositoryFactory:
+class ServiceFactory:
     def __init__(self, config):
+        # TODO: 这里和 repository_service 中的代码重复了，说明 nest_client 也应当由外部传入。
         assert isinstance(config, IConfig)
         enigma_machine_section = config['enigma_machine']
         enigma_machine = FernetEnigmaMachine(enigma_machine_section['password'])
@@ -33,23 +31,7 @@ class RepositoryFactory:
         )
         self.nest_client = nest_client
 
-    def for_location(self):
-        return NestLocationRepository(
-            nest_client=self.nest_client,
-        )
-
-    def for_plan(self):
-        return PlanRepository(
-            nest_client=self.nest_client,
-        )
-
-    def for_task(self):
-        return TaskRepository(
-            enigma_machine=self.enigma_machine,
-            nest_client=self.nest_client,
-        )
-
-    def for_user(self) -> IUserRepository:
-        return NestUserRepository(
+    def user(self) -> IUserService:
+        return NestUserService(
             nest_client=self.nest_client,
         )

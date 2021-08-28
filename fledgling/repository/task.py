@@ -9,7 +9,7 @@ from fledgling.app.entity.task import (
     TaskRepositoryError,
     TaskStatus,
 )
-from fledgling.repository.nest_gateway import INestGateway, NetworkError
+from fledgling.gateway.nest_gateway import INestGateway, NetworkError
 
 
 class IEnigmaMachine(ABC):

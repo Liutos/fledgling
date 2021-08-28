@@ -6,7 +6,7 @@ from fledgling.app.entity.location import (
     Location,
     LocationRepositoryError,
 )
-from fledgling.repository.nest_gateway import INestGateway
+from fledgling.gateway.nest_gateway import INestGateway
 
 
 class NestLocationRepository(ILocationRepository):

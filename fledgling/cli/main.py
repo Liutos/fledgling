@@ -6,6 +6,7 @@ import logging
 
 from xdg import xdg_data_home
 
+from fledgling.cli.command.activate_user import activate_user
 from fledgling.cli.command.change_plan import change_plan
 from fledgling.cli.command.create_config import create_config
 from fledgling.cli.command.create_plan import create_plan
@@ -29,6 +30,7 @@ def cli(ctx: click.Context, *, config_file: Optional[str]):
     ctx.obj['config'] = config
 
 
+cli.add_command(activate_user)
 cli.add_command(change_plan)
 cli.add_command(create_config)
 

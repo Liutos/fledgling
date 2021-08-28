@@ -6,7 +6,7 @@ from fledgling.app.use_case.change_plan import (
     ChangePlanUseCase,
     IParams,
 )
-from fledgling.repository.nest_gateway import INestGateway
+from fledgling.gateway.nest_gateway import INestGateway
 from fledgling.repository.plan import PlanRepository
 
 _repeat_type = None

@@ -7,7 +7,7 @@ from fledgling.app.entity.plan import (
     Plan,
     PlanRepositoryError,
 )
-from fledgling.repository.nest_gateway import INestGateway, NetworkError
+from fledgling.gateway.nest_gateway import INestGateway, NetworkError
 
 
 class PlanRepository(IPlanRepository):

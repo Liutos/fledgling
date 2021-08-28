@@ -10,7 +10,7 @@ from requests import (
     request,
 )
 
-from fledgling.repository.nest_gateway import (
+from fledgling.gateway.nest_gateway import (
     INestGateway,
     NetworkError,
 )
@@ -48,8 +48,8 @@ class NestClient(INestGateway):
 
         self.cookies = cookies
 
-    def request(self, *, pathname, **kwargs):
-        if not self.cookies:
+    def request(self, *, pathname, skip_login: bool = False, **kwargs):
+        if not skip_login and not self.cookies:
             self.login(
                 email=self.email,
                 password=self.password,

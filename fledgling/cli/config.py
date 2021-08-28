@@ -1,4 +1,5 @@
 # -*- coding: utf8 -*-
+from abc import ABC, abstractmethod
 from typing import Optional
 import configparser
 import os
@@ -6,9 +7,31 @@ import pathlib
 
 from xdg import xdg_config_home
 
-from fledgling.cli.repository_factory import IConfig
+
+class IConfig(ABC):
+    def __getitem__(self, item):
+        return self.get(item)
+
+    @abstractmethod
+    def dump(self, is_overwrite):
+        """
+        将配置持久化存储。
+        """
+        pass
+
+    @abstractmethod
+    def get(self, *keys):
+        pass
+
+    @abstractmethod
+    def load(self):
+        """
+        加载配置。
+        """
+        pass
 
 
+# FIXME: 具体实现不应当和抽象接口放在一起。
 class IniFileConfig(IConfig):
     """
     基于.ini文件的配置。
