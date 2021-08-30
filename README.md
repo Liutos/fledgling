@@ -48,6 +48,14 @@ port = nest 服务的端口号
 protocol = nest 服务的协议名称
 ```
 
+如果你不想或不方便搭建自己的`nest`服务，可以使用我所提供的`nest`服务，其主机、端口，以及协议如下
+
+```ini
+hostname = nest.daquan.tech
+port = 443
+protocol = https
+```
+
 # 用法
 
 ## 帮助文档
@@ -92,6 +100,25 @@ Options:
   --visible-wdays TEXT
   --help                     Show this message and exit.
 ```
+
+## 注册帐号
+
+使用`register`命令注册账号
+
+```shell
+➜  fledgling fledgling register --help
+Usage: fledgling register [OPTIONS]
+
+  注册一个新用户。
+
+Options:
+  --email TEXT     登录用的邮箱  [required]
+  --nickname TEXT  昵称  [required]
+  --password TEXT  登录所需的密码  [required]
+  --help           Show this message and exit.
+```
+
+如果你的`fledgling`连接的是我所提供的`nest`服务（配置见前文所述），那么将会有一封来自`nest_service@sina.com`的、含有激活码的邮件发送到你注册所用的邮箱中。之后使用`fledgling`的`activate-user`命令激活帐号即可。
 
 ## 示例
 
