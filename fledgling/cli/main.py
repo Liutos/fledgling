@@ -15,6 +15,7 @@ from fledgling.cli.command.register import register
 from fledgling.cli.command.delete_plan import delete_plan
 from fledgling.cli.command.delete_task import delete_task
 from fledgling.cli.command.event_loop import event_loop
+from fledgling.cli.command.list_location import list_location
 from fledgling.cli.command.list_plan import list_plan
 from fledgling.cli.command.list_task import list_task
 from fledgling.cli.config import IniFileConfig
@@ -40,7 +41,7 @@ cli.add_command(create_task)
 cli.add_command(delete_plan)
 cli.add_command(delete_task)
 cli.add_command(event_loop)
-
+cli.add_command(list_location)
 cli.add_command(list_plan)
 
 cli.add_command(list_task)
