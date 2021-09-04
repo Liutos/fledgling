@@ -13,18 +13,22 @@ from fledgling.cli.repository_factory import RepositoryFactory
 class Params(IParams):
     def __init__(self, *, keyword: Optional[str] = None, page, per_page,
                  plan_trigger_time: Optional[str],
-                 status: Optional[int]):
+                 status: Optional[int],
+                 task_ids_text: Optional[str] = None):
         self.keyword = keyword
         self.page = page
         self.per_page = per_page
         self.plan_trigger_time = None
         self.status = status
+        self.task_ids = None
         if plan_trigger_time:
             begin, end = plan_trigger_time.split(',')
             self.plan_trigger_time = (
                 datetime.strptime(begin, '%Y-%m-%d %H:%M:%S'),
                 datetime.strptime(end, '%Y-%m-%d %H:%M:%S'),
             )
+        if task_ids_text:
+            self.task_ids = [int(task_id) for task_id in task_ids_text.split(',')]
 
     def get_keyword(self) -> Optional[str]:
         return self.keyword
@@ -40,6 +44,9 @@ class Params(IParams):
 
     def get_status(self) -> Optional[int]:
         return self.status
+
+    def get_task_ids(self) -> Optional[List[int]]:
+        return self.task_ids
 
 
 class ConsolePresenter(IPresenter):
@@ -59,8 +66,9 @@ class ConsolePresenter(IPresenter):
 @click.option('--per-page', default=10, show_default=True)
 @click.option('--plan-trigger-time', help='任务的计划触发时间范围', type=str)
 @click.option('--status', help='任务的状态', type=click.INT)
+@click.option('--task-ids', help='要查看的任务的ID', type=str)
 @click.pass_context
-def list_task(ctx: click.Context, *, keyword, page, per_page, plan_trigger_time, status):
+def list_task(ctx: click.Context, *, keyword, page, per_page, plan_trigger_time, status, task_ids):
     """
     列出任务。
     """
@@ -70,6 +78,7 @@ def list_task(ctx: click.Context, *, keyword, page, per_page, plan_trigger_time,
         per_page=per_page,
         plan_trigger_time=plan_trigger_time,
         status=status,
+        task_ids_text=task_ids,
     )
     config = ctx.obj['config']
     repository_factory = RepositoryFactory(config)

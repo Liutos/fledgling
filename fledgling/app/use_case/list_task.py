@@ -25,6 +25,10 @@ class IParams(ABC):
     def get_status(self) -> Optional[int]:
         raise NotImplementedError
 
+    @abstractmethod
+    def get_task_ids(self) -> Optional[List[int]]:
+        pass
+
 
 class IPresenter(ABC):
     def show_task(self, *, tasks: List[Task]):
@@ -44,11 +48,13 @@ class ListTaskUseCase:
         keyword = params.get_keyword()
         page = params.get_page()
         per_page = params.get_per_page()
+        task_ids = params.get_task_ids()
         tasks = self.task_repository.list(
             keyword=keyword,
             page=page,
             per_page=per_page,
             plan_trigger_time=params.get_plan_trigger_time(),
             status=params.get_status(),
+            task_ids=task_ids,
         )
         self.presenter.show_task(tasks=tasks)
