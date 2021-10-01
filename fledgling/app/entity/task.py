@@ -19,7 +19,7 @@ class Task:
         self.brief = None
         self.id = None
         self.keywords = []
-        self.status = None
+        self.status: Optional[TaskStatus] = None
 
     @classmethod
     def new(cls, *, brief, id_=None, keywords: List[str] = None,

@@ -30,21 +30,39 @@ class TaskRepository(ITaskRepository):
         self.nest_client = nest_client
 
     def add(self, task: Task) -> Task:
-        crypted_brief = self.enigma_machine.encrypt(task.brief)
-        response = self.nest_client.request(
-            json={
-                'brief': crypted_brief,
-                'keywords': task.keywords,
-            },
-            method='POST',
-            pathname='/task',
-        )
-        response = response.json()
-        if response['status'] == 'failure':
-            raise TaskRepositoryError(response['error']['message'])
+        if task.id is None:
+            crypted_brief = self.enigma_machine.encrypt(task.brief)
+            response = self.nest_client.request(
+                json={
+                    'brief': crypted_brief,
+                    'keywords': task.keywords,
+                },
+                method='POST',
+                pathname='/task',
+            )
+            response = response.json()
+            if response['status'] == 'failure':
+                raise TaskRepositoryError(response['error']['message'])
 
-        id_ = response['result']['id']
-        return self.get_by_id(id_)
+            id_ = response['result']['id']
+            return self.get_by_id(id_)
+        else:
+            crypted_brief = self.enigma_machine.encrypt(task.brief)
+            response = self.nest_client.request(
+                json={
+                    'brief': crypted_brief,
+                    'keywords': task.keywords,
+                    'status': task.status.value,
+                },
+                method='PATCH',
+                pathname='/task/{}'.format(task.id),
+            )
+            response = response.json()
+            if response['status'] == 'failure':
+                raise TaskRepositoryError(response['error']['message'])
+
+            id_ = response['result']['id']
+            return self.get_by_id(id_)
 
     def get_by_id(self, id_) -> Union[None, Task]:
         try:
