@@ -15,11 +15,15 @@ from fledgling.cli.repository_factory import RepositoryFactory
 
 
 class Params(IParams):
-    def __init__(self, *, location_name: Optional[str], no_location: bool, page, per_page):
+    def __init__(self, *, location_name: Optional[str], no_location: bool, page, per_page,
+                 plan_ids: Optional[str] = None):
         self.location_name = location_name
         self.no_location = no_location
         self.page = page
         self.per_page = per_page
+        self.plan_ids: Optional[List[int]] = None
+        if plan_ids is not None:
+            self.plan_ids = list(map(int, plan_ids.split(',')))
 
     def get_location_name(self) -> Optional[str]:
         return self.location_name
@@ -32,6 +36,9 @@ class Params(IParams):
 
     def get_per_page(self) -> int:
         return self.per_page
+
+    def get_plan_ids(self) -> Optional[List[int]]:
+        return self.plan_ids
 
 
 class ConsolePresenter(IPresenter):
@@ -142,8 +149,9 @@ class ConsolePresenter(IPresenter):
 @click.option('--no-location', default=False, help='是否不按地点过滤', is_flag=True, show_default=True, type=click.BOOL)
 @click.option('--page', default=1, type=click.INT)
 @click.option('--per-page', default=10, type=click.INT)
+@click.option('--plan-ids', type=click.STRING)
 @click.pass_context
-def list_plan(ctx: click.Context, *, no_location: bool, page, per_page):
+def list_plan(ctx: click.Context, *, no_location: bool, page, per_page, plan_ids: Optional[str] = None):
     """
     列出接下来的计划。
     """
@@ -158,6 +166,7 @@ def list_plan(ctx: click.Context, *, no_location: bool, page, per_page):
             no_location=no_location,
             page=page,
             per_page=per_page,
+            plan_ids=plan_ids,
         ),
         plan_repository=repository_factory.for_plan(),
         presenter=ConsolePresenter(),

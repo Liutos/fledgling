@@ -60,13 +60,16 @@ class PlanRepository(IPlanRepository):
             return None
         return self._dto_to_entity(result)
 
-    def list(self, *, location_id: Optional[int] = None, page, per_page) -> Tuple[List[Plan], int]:
+    def list(self, *, location_id: Optional[int] = None, page, per_page,
+             plan_ids: Optional[List[int]] = None) -> Tuple[List[Plan], int]:
         params = {
             'page': page,
             'per_page': per_page,
         }
         if location_id:
             params['location_id'] = location_id
+        if plan_ids is not None:
+            params['plan_ids'] = ','.join(map(str, plan_ids))
         response = self.nest_client.request(
             method='GET',
             params=params,

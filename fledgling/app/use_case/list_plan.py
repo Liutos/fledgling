@@ -22,6 +22,10 @@ class IParams(ABC):
     def get_per_page(self) -> int:
         pass
 
+    @abstractmethod
+    def get_plan_ids(self) -> Optional[List[int]]:
+        pass
+
 
 class IPresenter(ABC):
     @abstractmethod
@@ -75,6 +79,9 @@ class ListPlanUseCase:
         }
         if location_id is not None:
             criteria['location_id'] = location_id
+        plan_ids = self.params.get_plan_ids()
+        if plan_ids is not None:
+            criteria['plan_ids'] = plan_ids
         plans, count = self.plan_repository.list(**criteria)
         location_ids = [plan.location_id for plan in plans]
         self.presenter.on_find_location()

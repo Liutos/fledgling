@@ -80,7 +80,8 @@ class IPlanRepository(ABC):
         pass
 
     @abstractmethod
-    def list(self, *, location_id: Optional[int] = None, page, per_page) -> Tuple[List[Plan], int]:
+    def list(self, *, location_id: Optional[int] = None, page, per_page,
+             plan_ids: Optional[List[int]] = None) -> Tuple[List[Plan], int]:
         """
         获取指定页码的计划。
         """
