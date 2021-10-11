@@ -12,7 +12,7 @@ class INestGateway(ABC):
         pass
 
     @abstractmethod
-    def request(self, *, pathname, skip_login: bool = False, **kwargs):
+    def request(self, *, method: str, pathname: str, skip_login: bool = False, **kwargs):
         """
         向nest服务发送请求。
         """

@@ -57,7 +57,7 @@ class MockParams(IParams):
         return True, 60
 
     def get_location_id(self) -> Tuple[bool, Union[None, int]]:
-        pass
+        return False, None
 
     def get_plan_id(self) -> int:
         return 233

@@ -30,6 +30,10 @@ class ILocationRepository(ABC):
              per_page: Optional[int] = 1) -> List[Location]:
         pass
 
+    @abstractmethod
+    def remove(self, *, id_: int):
+        pass
+
 
 class InvalidLocationError(Exception):
     def __init__(self, *, name: str):

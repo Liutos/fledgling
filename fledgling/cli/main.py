@@ -13,6 +13,7 @@ from fledgling.cli.command.create_config import create_config
 from fledgling.cli.command.create_plan import create_plan
 from fledgling.cli.command.create_task import create_task
 from fledgling.cli.command.register import register
+from fledgling.cli.command.delete_location import delete_location
 from fledgling.cli.command.delete_plan import delete_plan
 from fledgling.cli.command.delete_task import delete_task
 from fledgling.cli.command.event_loop import event_loop
@@ -40,6 +41,7 @@ cli.add_command(create_config)
 cli.add_command(create_plan)
 
 cli.add_command(create_task)
+cli.add_command(delete_location)
 cli.add_command(delete_plan)
 cli.add_command(delete_task)
 cli.add_command(event_loop)
