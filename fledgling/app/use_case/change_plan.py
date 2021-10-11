@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 from abc import ABC, abstractmethod
-from datetime import timedelta
-from typing import Set, Tuple, Union
+from datetime import datetime, timedelta
+from typing import Optional, Set, Tuple, Union
 
 from fledgling.app.entity.plan import IPlanRepository
 
@@ -32,7 +32,7 @@ class IParams(ABC):
         pass
 
     @abstractmethod
-    def get_trigger_time(self) -> Tuple[bool, Union[None, str]]:
+    def get_trigger_time(self) -> Tuple[bool, Optional[datetime]]:
         pass
 
     @abstractmethod

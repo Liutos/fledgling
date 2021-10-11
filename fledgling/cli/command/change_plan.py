@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
-from datetime import timedelta
-from typing import List, Set, Tuple, Union
+from datetime import datetime, timedelta
+from typing import List, Optional, Set, Tuple, Union
 
 import click
 
@@ -13,7 +13,7 @@ class Params(IParams):
                  location_id: Union[None, int] = None,
                  plan_id,
                  repeat_interval: Union[None, int] = None,
-                 repeat_type, trigger_time,
+                 repeat_type, trigger_time: str,
                  visible_hours: Union[None, List[int]] = None,
                  visible_wdays: Union[None, List[int]] = None):
         self.duration = duration
@@ -43,8 +43,11 @@ class Params(IParams):
     def get_repeat_type(self) -> Tuple[bool, Union[None, str]]:
         return bool(self.repeat_type), self.repeat_type
 
-    def get_trigger_time(self) -> Tuple[bool, Union[None, str]]:
-        return bool(self.trigger_time), self.trigger_time
+    def get_trigger_time(self) -> Tuple[bool, Optional[datetime]]:
+        trigger_time = None
+        if self.trigger_time is not None:
+            trigger_time = datetime.strptime(self.trigger_time, '%Y-%m-%d %H:%M:%S')
+        return bool(self.trigger_time), trigger_time
 
     def get_visible_hours(self) -> Tuple[bool, Union[None, Set[int]]]:
         return bool(self.visible_hours), self.visible_hours
