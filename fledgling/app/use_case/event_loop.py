@@ -46,10 +46,10 @@ class AlertState:
         pid = self.process.pid
         try:
             self.process.wait(timeout=1)
-            print('进程{}已退出'.format(pid))
+            logging.info('进程{}已退出'.format(pid))
         except subprocess.TimeoutExpired:
             self.process.terminate()
-            print('向进程{}发送SIGTERM信号'.format(pid))
+            logging.info('向进程{}发送SIGTERM信号'.format(pid))
 
 
 class EventLoopUseCase:
@@ -90,7 +90,7 @@ class EventLoopUseCase:
                         process=child_process,
                     )
                 else:
-                    print('没有可处理的计划')
+                    logging.info('没有可处理的计划')
             except PlanRepositoryError:
                 logging.warning('获取计划失败')
             except TaskRepositoryError:

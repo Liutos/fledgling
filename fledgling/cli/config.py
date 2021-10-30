@@ -42,7 +42,6 @@ class IniFileConfig(IConfig):
             config_file = config_dir.joinpath('config.ini')
         if isinstance(config_file, str):
             config_file = pathlib.Path(config_file)
-        print('config_file', config_file)
         self.config = configparser.ConfigParser()
         self.config_dir = config_dir
         self.config_file = config_file
@@ -75,4 +74,3 @@ class IniFileConfig(IConfig):
             exit(1)
 
         self.config.read(self.config_file)
-        print('config.sections()', self.config.sections())

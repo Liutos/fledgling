@@ -33,7 +33,6 @@ class PlanRepository(IPlanRepository):
             return plan
         else:
             json = self._entity_to_dto(plan)
-            print('json', json)
             pathname = '/plan/{}'.format(plan.id)
             response = self.nest_client.request(
                 json=json,
@@ -101,7 +100,6 @@ class PlanRepository(IPlanRepository):
         if response['status'] == 'failure':
             raise PlanRepositoryError(response['error']['message'])
 
-        print('response', response)
         plans = response['result']
         if len(plans) == 0:
             return None

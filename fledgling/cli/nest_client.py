@@ -22,7 +22,6 @@ class NestClient(INestGateway):
         if cookies_path and isfile(cookies_path):
             with open(cookies_path, 'br') as file:
                 self.cookies = pickle.load(file)
-                print('从文件{}中读入上一次的Cookies'.format(cookies_path))
         else:
             self.cookies = None
         self.email = email
@@ -44,7 +43,6 @@ class NestClient(INestGateway):
         cookies = response.cookies
         with open(self.cookies_path, 'bw') as file:
             pickle.dump(cookies, file)
-            print('将Cookies写入到文件中。')
 
         self.cookies = cookies
 

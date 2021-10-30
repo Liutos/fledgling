@@ -47,12 +47,10 @@ class ConsolePresenter(IPresenter):
         self.plans = []
 
     def on_find_location(self):
-        print('\r正在查找计划关联的地点', end='')
-        sleep(1)
+        pass
 
     def on_find_task(self):
-        print('\r正在查找计划关联的任务')
-        sleep(1)
+        pass
 
     def on_invalid_location(self, *, error: InvalidLocationError):
         raise NotImplementedError
