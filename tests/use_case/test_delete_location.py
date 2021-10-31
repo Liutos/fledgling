@@ -28,6 +28,9 @@ class MockLocationRepository(ILocationRepository):
     def remove(self, *, id_: int):
         self.location_id = id_
 
+    def save(self, *, location: Location):
+        pass
+
 
 class MockParams(IParams):
     def get_location_id(self) -> int:

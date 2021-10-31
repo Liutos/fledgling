@@ -34,6 +34,10 @@ class ILocationRepository(ABC):
     def remove(self, *, id_: int):
         pass
 
+    @abstractmethod
+    def save(self, *, location: Location):
+        pass
+
 
 class InvalidLocationError(Exception):
     def __init__(self, *, name: str):
