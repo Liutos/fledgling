@@ -10,7 +10,7 @@ class Location:
         self.user_id = None
 
     @classmethod
-    def new(cls, *, id_: int = None, name: str, user_id: int):
+    def new(cls, *, id_: int = None, name: str, user_id: Optional[int] = None):
         instance = Location()
         instance.id = id_
         instance.name = name

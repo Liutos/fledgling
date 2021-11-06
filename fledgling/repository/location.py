@@ -64,15 +64,31 @@ class NestLocationRepository(ILocationRepository):
             raise LocationRepositoryError(response['error']['message'])
 
     def save(self, *, location: Location):
-        assert location.id is not None
-        pathname = '/location/{}'.format(location.id)
-        response = self.nest_client.request(
-            method='PATCH',
-            pathname=pathname,
-        )
-        response = response.json()
-        if response['status'] == 'failure':
-            raise LocationRepositoryError(response['error']['message'])
+        if location.id is not None:
+            pathname = '/location/{}'.format(location.id)
+            response = self.nest_client.request(
+                json={
+                    'name': location.name,
+                },
+                method='PATCH',
+                pathname=pathname,
+            )
+            response = response.json()
+            if response['status'] == 'failure':
+                raise LocationRepositoryError(response['error']['message'])
+        else:
+            pathname = '/location'
+            response = self.nest_client.request(
+                json={
+                    'name': location.name,
+                },
+                method='POST',
+                pathname=pathname,
+            )
+            # TODO: 统一这些对接口错误的处理。
+            response = response.json()
+            if response['status'] == 'failure':
+                raise LocationRepositoryError(response['error']['message'])
 
     def _dto_to_entity(self, dto):
         """将通过网络传输回来的对象反序列化为地点的实体对象。"""
