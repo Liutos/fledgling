@@ -10,7 +10,7 @@ class PlanRepositoryError(Exception):
 
 class Plan:
     def __init__(self):
-        self.duration = None
+        self.duration: Optional[int] = None
         self.id = None
         self.location = None
         self.location_id = None
@@ -26,7 +26,7 @@ class Plan:
         self.visible_wdays_description: str = ''
 
     @classmethod
-    def new(cls, *, duration: Union[None, int] = None,
+    def new(cls, *, duration: Optional[int] = None,
             id_=None, location_id: int, repeat_interval: Union[None, timedelta] = None,
             repeat_type=None,
             repeating_description: Union[None, str] = None,
@@ -48,6 +48,13 @@ class Plan:
         instance.visible_wdays = visible_wdays
         instance.visible_wdays_description = visible_wdays_description
         return instance
+
+    def is_outdated(self, now: datetime) -> bool:
+        """检查当前时间是否已经超过了计划的持续时间。"""
+        if self.duration is None:
+            return False
+
+        return now > self.trigger_time + timedelta(seconds=self.duration)
 
     def is_visible(self, *, trigger_time: datetime):
         """

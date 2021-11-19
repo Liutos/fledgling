@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 from abc import ABC, abstractmethod
+from datetime import datetime
 import logging
 import subprocess
 import time
@@ -79,16 +80,23 @@ class EventLoopUseCase:
             try:
                 plan = self.plan_repository.pop(location_id=location_id)
                 if plan:
-                    task_id = plan.task_id
-                    task = self.task_repository.get_by_id(task_id)
-                    child_process = self.alerter.alert(
-                        plan=plan,
-                        task=task,
-                    )
-                    self._keep_child_process(
-                        plan=plan,
-                        process=child_process,
-                    )
+                    if plan.is_outdated(datetime.now()):
+                        logging.info('计划{}已经过期了。trigger_time={}，duration={}'.format(
+                            plan.id,
+                            plan.trigger_time.strftime('%Y-%m-%d %H:%M:%S'),
+                            plan.duration,
+                        ))
+                    else:
+                        task_id = plan.task_id
+                        task = self.task_repository.get_by_id(task_id)
+                        child_process = self.alerter.alert(
+                            plan=plan,
+                            task=task,
+                        )
+                        self._keep_child_process(
+                            plan=plan,
+                            process=child_process,
+                        )
                 else:
                     logging.info('没有可处理的计划')
             except PlanRepositoryError:
