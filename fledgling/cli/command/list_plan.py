@@ -1,6 +1,5 @@
 # -*- coding: utf8 -*-
 from datetime import datetime
-from time import sleep
 from typing import List, Optional
 
 import click
@@ -16,7 +15,8 @@ from fledgling.cli.repository_factory import RepositoryFactory
 
 class Params(IParams):
     def __init__(self, *, location_name: Optional[str], no_location: bool, page, per_page,
-                 plan_ids: Optional[str] = None):
+                 plan_ids: Optional[str] = None,
+                 task_ids: str = ''):
         self.location_name = location_name
         self.no_location = no_location
         self.page = page
@@ -24,6 +24,9 @@ class Params(IParams):
         self.plan_ids: Optional[List[int]] = None
         if plan_ids is not None:
             self.plan_ids = list(map(int, plan_ids.split(',')))
+        self.task_ids = []
+        if len(task_ids) > 0:
+            self.task_ids = list(map(int, task_ids.split(',')))
 
     def get_location_name(self) -> Optional[str]:
         return self.location_name
@@ -39,6 +42,9 @@ class Params(IParams):
 
     def get_plan_ids(self) -> Optional[List[int]]:
         return self.plan_ids
+
+    def get_task_ids(self) -> List[int]:
+        return self.task_ids
 
 
 class ConsolePresenter(IPresenter):
@@ -143,13 +149,15 @@ class ConsolePresenter(IPresenter):
         print(row_text)
 
 
-@click.command()
+@click.command(name='plan')
 @click.option('--no-location', default=False, help='是否不按地点过滤', is_flag=True, show_default=True, type=click.BOOL)
 @click.option('--page', default=1, type=click.INT)
 @click.option('--per-page', default=10, type=click.INT)
 @click.option('--plan-ids', type=click.STRING)
+@click.option('--task-ids', default='', help='只筛选指定任务的计划', type=click.STRING)
 @click.pass_context
-def list_plan(ctx: click.Context, *, no_location: bool, page, per_page, plan_ids: Optional[str] = None):
+def list_plan(ctx: click.Context, *, no_location: bool, page, per_page, plan_ids: Optional[str] = None,
+              task_ids: Optional[str] = ''):
     """
     列出接下来的计划。
     """
@@ -165,6 +173,7 @@ def list_plan(ctx: click.Context, *, no_location: bool, page, per_page, plan_ids
             page=page,
             per_page=per_page,
             plan_ids=plan_ids,
+            task_ids=task_ids,
         ),
         plan_repository=repository_factory.for_plan(),
         presenter=ConsolePresenter(),

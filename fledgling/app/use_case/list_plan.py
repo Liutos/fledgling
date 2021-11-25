@@ -26,6 +26,10 @@ class IParams(ABC):
     def get_plan_ids(self) -> Optional[List[int]]:
         pass
 
+    @abstractmethod
+    def get_task_ids(self) -> List[int]:
+        pass
+
 
 class IPresenter(ABC):
     @abstractmethod
@@ -82,6 +86,7 @@ class ListPlanUseCase:
         plan_ids = self.params.get_plan_ids()
         if plan_ids is not None:
             criteria['plan_ids'] = plan_ids
+        criteria['task_ids'] = self.params.get_task_ids()
         plans, count = self.plan_repository.list(**criteria)
         location_ids = [plan.location_id for plan in plans]
         self.presenter.on_find_location()
