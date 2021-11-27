@@ -2,9 +2,13 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from fledgling.app.entity.location import ILocationRepository, InvalidLocationError
+from fledgling.app.entity.location import (
+    ILocationRepository,
+    InvalidLocationError,
+    Location,
+)
 from fledgling.app.entity.plan import IPlanRepository, Plan
-from fledgling.app.entity.task import ITaskRepository
+from fledgling.app.entity.task import ITaskRepository, Task
 
 
 class IParams(ABC):
@@ -88,20 +92,10 @@ class ListPlanUseCase:
             criteria['plan_ids'] = plan_ids
         criteria['task_ids'] = self.params.get_task_ids()
         plans, count = self.plan_repository.list(**criteria)
-        location_ids = [plan.location_id for plan in plans]
         self.presenter.on_find_location()
-        locations = self.location_repository.find(
-            ids=location_ids,
-            page=1,
-            per_page=len(location_ids),
-        )
-        task_ids = [plan.task_id for plan in plans]
+        locations = self._find_locations(plans)
         self.presenter.on_find_task()
-        tasks = self.task_repository.list(
-            page=1,
-            per_page=len(task_ids),
-            task_ids=task_ids,
-        )
+        tasks = self._find_tasks(plans)
         for plan in plans:
             location_id = plan.location_id
             location = [location for location in locations if location.id == location_id][0]
@@ -115,3 +109,25 @@ class ListPlanUseCase:
             plans=plans,
         )
         return
+
+    def _find_locations(self, plans: List[Plan]) -> List[Location]:
+        if len(plans) == 0:
+            return []
+
+        location_ids = [plan.location_id for plan in plans]
+        return self.location_repository.find(
+            ids=location_ids,
+            page=1,
+            per_page=len(location_ids),
+        )
+
+    def _find_tasks(self, plans: List[Plan]) -> List[Task]:
+        if len(plans) == 0:
+            return []
+
+        task_ids = [plan.task_id for plan in plans]
+        return self.task_repository.list(
+            page=1,
+            per_page=len(task_ids),
+            task_ids=task_ids,
+        )
