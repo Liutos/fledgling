@@ -12,6 +12,7 @@ class TaskRepositoryError(Exception):
 class TaskStatus(Enum):
     CREATED = 1
     FINISHED = 2
+    CANCELLED = 3
 
 
 class Task:
@@ -30,6 +31,9 @@ class Task:
         instance.keywords = keywords or []
         instance.status = status
         return instance
+
+    def is_cancelled(self) -> bool:
+        return self.status == TaskStatus.CANCELLED
 
     def is_finished(self) -> bool:
         return self.status == TaskStatus.FINISHED

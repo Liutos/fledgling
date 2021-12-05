@@ -53,9 +53,14 @@ class ConsolePresenter(IPresenter):
     def show_task(self, *, tasks: List[Task]):
         table = []
         for task in tasks:
-            table.append([task.id, task.brief, '是' if task.is_finished() else '否'])
+            status_desc = ''
+            if task.is_cancelled():
+                status_desc = '已取消'
+            elif task.is_finished():
+                status_desc = '已完成'
+            table.append([task.id, task.brief, status_desc])
         click.echo(tabulate(
-            headers=['任务ID', '任务简述', '是否已完成'],
+            headers=['任务ID', '任务简述', '状态'],
             tabular_data=table,
         ))
 

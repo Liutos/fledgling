@@ -34,7 +34,7 @@ class Params(IParams):
 @click.command()
 @click.option('--brief', help='任务简述', type=click.STRING)
 @click.option('--keywords', help='关键字', type=click.STRING)
-@click.option('--status', help='状态', type=click.INT)
+@click.option('--status', help='状态。2 表示已完成，3 表示已取消', type=click.INT)
 @click.option('--task-id', help='任务ID', type=click.INT)
 @click.pass_context
 def change_task(ctx: click.Context, *, brief, keywords, status, task_id):
