@@ -62,7 +62,7 @@ class ChangePlanUseCase:
             plan.duration = duration
         found, location_id = params.get_location_id()
         if found:
-            plan.keywords = location_id
+            plan.location_id = location_id
         found, repeat_interval = params.get_repeat_interval()
         if found:
             plan.task_id = repeat_interval
