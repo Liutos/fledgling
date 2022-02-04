@@ -58,11 +58,41 @@ class ConsolePresenter(IPresenter):
                 status_desc = '已取消'
             elif task.is_finished():
                 status_desc = '已完成'
-            table.append([task.id, task.brief, status_desc])
+            trigger_time_desc = ''
+            if len(task.plans) > 0:
+                plan = task.plans[0]
+                trigger_time_desc = self._format_trigger_time(plan.duration, plan.trigger_time)
+
+            table.append([task.id, task.brief, status_desc, trigger_time_desc])
         click.echo(tabulate(
-            headers=['任务ID', '任务简述', '状态'],
+            headers=['任务ID', '任务简述', '状态', '下一次计划的时间'],
             tabular_data=table,
         ))
+
+    # TODO: 消除与文件 fledgling/cli/command/list_plan.py 中的同名方法的重复代码。
+    def _format_trigger_time(self, duration: Optional[int], trigger_time: datetime) -> str:
+        format_ = '%Y-%m-%d %H:%M:%S'
+        now = datetime.now()
+        if trigger_time.day == now.day:
+            format_ = '%H:%M:%S'
+        elif self._is_tomorrow(now, trigger_time):
+            format_ = '明天%H:%M:%S'
+        elif self._is_day_after_tomorrow(now, trigger_time):
+            format_ = '后天%H:%M:%S'
+        elif trigger_time.month == now.month:
+            format_ = '%d %H:%M:%S'
+        elif trigger_time.year == now.year:
+            format_ = '%m-%d %H:%M:%S'
+        trigger_time_description = trigger_time.strftime(format_)
+        if duration is not None and duration > 0:
+            trigger_time_description += 'P{}S'.format(duration)
+        return trigger_time_description
+
+    def _is_day_after_tomorrow(self, now: datetime, trigger_time: datetime) -> bool:
+        return (trigger_time.date() - now.date()).days == 2
+
+    def _is_tomorrow(self, now: datetime, trigger_time: datetime) -> bool:
+        return (trigger_time.date() - now.date()).days == 1
 
 
 @click.command()

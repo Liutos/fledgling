@@ -4,6 +4,8 @@ from datetime import datetime
 from enum import Enum
 from typing import List, Optional, Tuple, Union
 
+from fledgling.app.entity.plan import Plan
+
 
 class TaskRepositoryError(Exception):
     pass
@@ -20,15 +22,18 @@ class Task:
         self.brief = None
         self.id = None
         self.keywords = []
+        self.plans: List[Plan] = []
         self.status: Optional[TaskStatus] = None
 
     @classmethod
     def new(cls, *, brief, id_=None, keywords: List[str] = None,
+            plans: List[Plan] = None,
             status: TaskStatus = None) -> 'Task':
         instance = Task()
         instance.brief = brief
         instance.id = id_
         instance.keywords = keywords or []
+        instance.plans = plans
         instance.status = status
         return instance
 

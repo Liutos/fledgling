@@ -1,8 +1,9 @@
 # -*- coding: utf8 -*-
 from abc import ABC, abstractmethod
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List, Optional, Tuple, Union
 
+from fledgling.app.entity.plan import Plan
 from fledgling.app.entity.task import (
     ITaskRepository,
     Task,
@@ -124,8 +125,32 @@ class TaskRepository(ITaskRepository):
             raise TaskRepositoryError(response['error']['message'])
 
     def _dto_to_entity(self, dto: dict):
+        plans = []
+        for plan_dto in dto['plans']:
+            plans.append(self._plan_dto_to_entity(plan_dto))
+
         return Task.new(
             brief=self.enigma_machine.decrypt(dto['brief']),
             id_=dto['id'],
+            plans=plans,
             status=TaskStatus(dto['status']),
         )
+
+    # TODO: 消除与文件 fledgling/repository/plan.py 中方法 _dto_to_entity 的重复代码。
+    def _plan_dto_to_entity(self, dto: dict) -> Plan:
+        """将计划的 DTO 转换为实体对象。"""
+        plan = Plan()
+        plan.duration = dto['duration']
+        plan.id = dto['id']
+        plan.location_id = dto['location_id']
+        if isinstance(dto.get('repeat_interval'), int):
+            plan.repeat_interval = timedelta(seconds=dto.get('repeat_interval'))
+        plan.repeat_type = dto['repeat_type']
+        plan.repeating_description = dto['repeating_description']
+        plan.task_id = dto['task_id']
+        plan.trigger_time = datetime.strptime(dto['trigger_time'], '%Y-%m-%d %H:%M:%S')
+        plan.visible_hours = set(dto['visible_hours'])
+        plan.visible_hours_description = dto['visible_hours_description']
+        plan.visible_wdays = set(dto['visible_wdays'])
+        plan.visible_wdays_description = dto['visible_wdays_description']
+        return plan
