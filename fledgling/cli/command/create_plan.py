@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from typing import List, Optional, Set, Union
 
 from fledgling.app.use_case.create_plan import CreatePlanUseCase, IParams
+from fledgling.cli import setting
 from fledgling.cli.repository_factory import RepositoryFactory
 
 
@@ -62,7 +63,7 @@ def validate_visible_hours(ctx, param, value: Union[None, str]):
 @click.option('--duration', type=click.INT)
 @click.option('--location-id', type=click.INT)
 @click.option('--repeat-interval', type=click.INT)
-@click.option('--repeat-type', type=click.STRING)
+@click.option('--repeat-type', help=setting.REPEAT_TYPE_HELP, type=click.Choice(setting.REPEAT_TYPES))
 @click.option('--task-id', required=True, type=click.INT)
 @click.option('--trigger-time', required=True, type=str)
 @click.option('--visible-hours', callback=validate_visible_hours, type=click.STRING)
