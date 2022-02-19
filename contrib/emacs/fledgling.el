@@ -6,8 +6,13 @@
 
 (defclass org-fledgling--task ()
   ((brief
+    :accessor org-fledgling--task-brief
     :documentation "任务的简述"
     :initarg :brief)
+   (id
+    :accessor org-fledgling--task-id
+    :documentation "任务的 ID。"
+    :initarg :id)
    (plans
     :documentation "该任务设定的计划。"
     :initarg :plans)))
@@ -35,7 +40,14 @@
     (princ program)
     (dolist (arg args)
       (princ " ")
-      (princ arg))))
+      (cond ((not (stringp arg))
+             (princ arg))
+            ((string-prefix-p "-" arg)
+             ;; 命令行选项不需要引号。
+             (princ arg))
+            (t
+             ;; 其余参数需要保留引号。
+             (prin1 arg))))))
 
 (defun org-fledgling--run-fledgling (program args)
   "调用程序 fledgling，执行 ARGS 所指定的子命令。"
@@ -45,6 +57,15 @@
 
   (let ((command (org-fledgling--make-command program args)))
     (shell-command-to-string command)))
+
+(defun org-fledgling--sync-task (task)
+  "更新或创建一个任务"
+  (assert (typep task org-fledgling--task))
+  ;; TODO: 暂不处理更新的场景。
+  (assert (null (org-fledgling--task-id task)))
+  (let* ((brief (org-fledgling--task-brief task))
+         (args (list "create-task" "--brief" brief)))
+    (org-fledgling--run-fledgling *org-fledgling-program* args)))
 ;;; 私有的符号 END
 
 ;;; 暴露的符号 BEGIN
