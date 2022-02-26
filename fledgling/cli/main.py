@@ -2,7 +2,7 @@
 from typing import Optional
 
 import click
-import logging
+import logging.handlers
 
 from xdg import xdg_data_home
 
@@ -58,12 +58,17 @@ log_dir = xdg_data_home().joinpath('fledgling')
 if not log_dir.is_dir():
     log_dir.mkdir(parents=True)
 log_file = log_dir.joinpath('fledgling.log')
-logging.basicConfig(
+handler = logging.handlers.TimedRotatingFileHandler(
     filename=str(log_file),
+    when='D',
+)
+kwargs = dict(
     format='%(levelname)s:%(asctime)s:%(message)s',
+    handlers=[handler],
     # TODO: 应当支持通过配置文件修改level。
     level=logging.DEBUG,
 )
+logging.basicConfig(**kwargs)
 
 
 if __name__ == '__main__':
