@@ -136,3 +136,18 @@ fledgling create-task --brief '喝水'
 fledgling create-plan --task-id 3 --trigger-time '2021-08-15 18:20:00' --repeat-type 'hourly'
 ```
 
+# FAQ
+
+## 如何从源码安装？
+
+在 fledgling 仓库的根目录中运行下列命令
+
+```shell
+python setup.py sdist
+```
+
+这会在子目录 ./dist 中生成一个文件 fledgling-0.0.1.tar.gz。接着使用 pip 安装即可
+
+```shell
+pip install ./dist/fledgling-0.0.1.tar.gz
+```
