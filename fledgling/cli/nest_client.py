@@ -3,10 +3,13 @@ from datetime import datetime
 import json
 import logging
 from os.path import isfile
+from typing import Optional
 import pickle
 
 from requests import (
     ConnectionError,
+    PreparedRequest,
+    Response,
     request,
 )
 
@@ -29,23 +32,29 @@ class NestClient(INestGateway):
         self.url_prefix = '{}://{}:{}'.format(protocol, hostname, port)
 
     def login(self, *, email, password):
-        response = request(
+        response = self.request(
             json={
                 'email': email,
                 'password': password,
             },
             method='POST',
-            url='{}/user/login'.format(self.url_prefix),
+            pathname='/user/login',
+            skip_login=True,
         )
-        # TODO: 展示 nest 返回的错误原因。
         if response.status_code != 200:
-            raise Exception('登录失败')
+            # 这里遇到了一个用 HTTP 状态码来承载业务处理结果的坏处：即使已知响应的状态码不为 200，却仍然无法假定此时 response.text 中的
+            # 数据的格式。
+            decoded = json.loads(response.text)
+            error = decoded['error']
+            raise Exception('登录失败：{}, {}'.format(error['code'], error['message']))
+
         cookies = response.cookies
         with open(self.cookies_path, 'bw') as file:
             pickle.dump(cookies, file)
 
         self.cookies = cookies
 
+    # TODO: 建议分化出一个 authenticated_request，避免该方法与 login 递归。
     def request(self, *, pathname, skip_login: bool = False, **kwargs):
         if not skip_login and not self.cookies:
             self.login(
@@ -55,42 +64,47 @@ class NestClient(INestGateway):
 
         started_date_time = datetime.now()
         url = '{}{}'.format(self.url_prefix, pathname)
+        # 必须在此定义，否则 finally 中将有可能是未定义的变量。
+        req: Optional[PreparedRequest] = None
+        response: Optional[Response] = None
         try:
             response = request(
                 cookies=self.cookies,
                 url=url,
                 **kwargs
             )
-            query_string = []
-            for name, value in kwargs.get('params', {}).items():
-                query_string.append({
-                    'name': name,
-                    'value': str(value),
-                })
-            post_data = {}
             req = response.request
-            post_data['mimeType'] = req.headers.get('Content-Type')
-            post_data['text'] = req.body
-            if isinstance(post_data['text'], bytes):
-                post_data['text'] = post_data['text'].decode('utf-8')
+
+            return response
+        except ConnectionError as e:
+            logging.warning('请求{}失败：{}'.format(url, str(e)))
+            raise NetworkError()
+        finally:
             req_cookies = []
-            for k, v in self.cookies.items():
-                req_cookies.append({
-                    'name': k,
-                    'value': v,
-                })
+            if self.cookies is not None:
+                req_cookies = self._extract_name_values(self.cookies)
+
+            post_data = {}
             req_headers = []
-            # TODO: 这种将dict转换为name-value对数组的功能可以提炼一下。
-            for k, v in req.headers.items():
-                req_headers.append({
-                    'name': k,
-                    'value': v,
-                })
-            content = {
-                'mimeType': response.headers['Content-Type'],
-                'size': response.headers['Content-Length'],
-                'text': response.text,
-            }
+            if req is not None:
+                req_headers = self._extract_name_values(req.headers)
+
+                post_data = {
+                    'mimeType': req.headers.get('Content-Type'),
+                    'text': req.body,
+                }
+                if isinstance(post_data['text'], bytes):
+                    post_data['text'] = post_data['text'].decode('utf-8')
+
+            query_string = self._extract_name_values(kwargs.get('params', {}))
+
+            content = {}
+            if response is not None:
+                content = {
+                    'mimeType': response.headers['Content-Type'],
+                    'size': response.headers['Content-Length'],
+                    'text': response.text,
+                }
 
             logging.debug(json.dumps({
                 'log': {
@@ -129,7 +143,16 @@ class NestClient(INestGateway):
                     'version': '',
                 }
             }))
-            return response
-        except ConnectionError as e:
-            logging.warning('请求{}失败：{}'.format(url, str(e)))
-            raise NetworkError()
+
+    def _extract_name_values(self, dct):
+        if dct is None:
+            return []
+
+        name_values = []
+        for name, value in dct.items():
+            name_values.append({
+                'name': name,
+                'value': str(value),
+            })
+
+        return name_values
