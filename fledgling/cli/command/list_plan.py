@@ -10,6 +10,7 @@ from wcwidth import wcswidth
 from fledgling.app.entity.location import InvalidLocationError
 from fledgling.app.entity.plan import Plan
 from fledgling.app.use_case.list_plan import IParams, IPresenter, ListPlanUseCase
+from fledgling.cli.config import IniFileConfig
 from fledgling.cli.repository_factory import RepositoryFactory
 
 
@@ -59,7 +60,7 @@ class ConsolePresenter(IPresenter):
         pass
 
     def on_invalid_location(self, *, error: InvalidLocationError):
-        raise NotImplementedError
+        click.echo('无效的地点：{}'.format(error.name))
 
     def show_plans(self, *, count: int, plans: List[Plan]):
         self.count = count
@@ -161,14 +162,14 @@ def list_plan(ctx: click.Context, *, no_location: bool, page, per_page, plan_ids
     """
     列出接下来的计划。
     """
-    config = ctx.obj['config']
+    config: IniFileConfig = ctx.obj['config']
     repository_factory = RepositoryFactory(
         config=config,
     )
     use_case = ListPlanUseCase(
         location_repository=repository_factory.for_location(),
         params=Params(
-            location_name=config['location']['name'],
+            location_name=config.get('location', 'name'),
             no_location=no_location,
             page=page,
             per_page=per_page,

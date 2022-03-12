@@ -22,6 +22,7 @@ class NestUserRepository(IUserRepository):
             json=json,
             method='POST',
             pathname='/user',
+            skip_login=True,
         )
         response = response.json()
         if response['status'] == 'failure':

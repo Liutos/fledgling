@@ -61,6 +61,9 @@ class IniFileConfig(IConfig):
     def get(self, *keys):
         result = self.config
         for key in keys:
+            if key not in result:
+                return None
+
             result = result[key]
         return result
 
