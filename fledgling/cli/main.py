@@ -27,12 +27,15 @@ from fledgling.cli.config import IniFileConfig
 
 @click.group()
 @click.option('--config-file', help='配置文件路径')
+@click.option('--json', 'is_json', default=False, help='是否以 JSON 格式输出结果', is_flag=True, type=click.BOOL)
 @click.pass_context
-def cli(ctx: click.Context, *, config_file: Optional[str]):
+def cli(ctx: click.Context, *, config_file: Optional[str],
+        is_json: bool):
     config = IniFileConfig(config_file=config_file)
     config.load()
     ctx.ensure_object(dict)
     ctx.obj['config'] = config
+    ctx.obj['is_json'] = is_json
 
 
 cli.add_command(activate_user)

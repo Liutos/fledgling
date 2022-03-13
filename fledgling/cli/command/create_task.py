@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 from typing import List
+import json
 
 import click
 from tabulate import tabulate
@@ -30,6 +31,7 @@ def create_task(ctx: click.Context, *, brief, keywords):
     创建一个任务。
     """
     config = ctx.obj['config']
+    is_json: bool = ctx.obj['is_json']
     params = Params(
         brief=brief,
         keywords=keywords,
@@ -43,7 +45,13 @@ def create_task(ctx: click.Context, *, brief, keywords):
         task_repository=task_repository,
     )
     task = use_case.run()
-    click.echo(tabulate(
-        headers=['任务ID', '任务简述'],
-        tabular_data=[[task.id, task.brief]],
-    ))
+    if is_json:
+        click.echo(json.dumps({
+            'brief': task.brief,
+            'id': task.id,
+        }))
+    else:
+        click.echo(tabulate(
+            headers=['任务ID', '任务简述'],
+            tabular_data=[[task.id, task.brief]],
+        ))
