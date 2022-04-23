@@ -38,6 +38,7 @@
 
   (with-output-to-string
     (princ program)
+    (princ " --json")                   ; 要求 fledgling 以 JSON 格式将结果打印到标准输出，以便于解析。
     (dolist (arg args)
       (princ " ")
       (cond ((not (stringp arg))
@@ -48,6 +49,14 @@
             (t
              ;; 其余参数需要保留引号。
              (prin1 arg))))))
+
+(defun org-fledgling--parse-task-id (raw-output)
+  "解析创建任务的命令所打印出的任务的 ID，以数值类型返回。
+
+参数 RAW-OUTPUT 是不加处理的、fledgling 的子命令 create-task 所打印的内容。"
+  ;; json-parse-string 的文档见[这里](https://www.gnu.org/software/emacs/manual/html_node/elisp/Parsing-JSON.html#index-json_002dparse_002dstring)。
+  (let ((parsed (json-parse-string raw-output)))
+    (gethash "id" parsed)))
 
 (defun org-fledgling--run-fledgling (program args)
   "调用程序 fledgling，执行 ARGS 所指定的子命令。"
@@ -64,8 +73,10 @@
   ;; TODO: 暂不处理更新的场景。
   (assert (null (org-fledgling--task-id task)))
   (let* ((brief (org-fledgling--task-brief task))
-         (args (list "create-task" "--brief" brief)))
-    (org-fledgling--run-fledgling *org-fledgling-program* args)))
+         (args (list "create-task" "--brief" brief))
+         (raw-output (org-fledgling--run-fledgling *org-fledgling-program* args))
+         (task-id (org-fledgling--parse-task-id raw-output)))
+    (message "新建了任务 %d" task-id)))
 ;;; 私有的符号 END
 
 ;;; 暴露的符号 BEGIN
