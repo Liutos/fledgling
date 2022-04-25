@@ -21,13 +21,18 @@
   "从当前光标所在的条目中构造出创建任务、计划所需要的数据。"
   (let* ((brief (nth 4 (org-heading-components)))
          (scheduled (org-entry-get nil "SCHEDULED"))
+         (task-id (org-entry-get nil "TASK_ID"))
          ;; TODO: 此处还需要先将 SCHEDULED 转换为 TRIGGER-TIME 的格式才行。
          (plans nil))
     (when scheduled
       (setf plans (make-instance 'org-fledgling--plan
                                  :trigger-time scheduled)))
+    (when task-id
+      (setf task-id (string-to-number task-id)))
+
     (make-instance 'org-fledgling--task
                    :brief brief
+                   :id task-id
                    :plans plans)))
 
 (defun org-fledgling--make-command (program args)
@@ -65,18 +70,26 @@
     (assert (or (numberp arg) (stringp arg))))
 
   (let ((command (org-fledgling--make-command program args)))
+    (message "即将执行的命令为：%s" command)
     (shell-command-to-string command)))
 
 (defun org-fledgling--sync-task (task)
   "更新或创建一个任务"
   (assert (typep task org-fledgling--task))
-  ;; TODO: 暂不处理更新的场景。
-  (assert (null (org-fledgling--task-id task)))
-  (let* ((brief (org-fledgling--task-brief task))
-         (args (list "create-task" "--brief" brief))
-         (raw-output (org-fledgling--run-fledgling *org-fledgling-program* args))
-         (task-id (org-fledgling--parse-task-id raw-output)))
-    (message "新建了任务 %d" task-id)))
+  (cond ((null (org-fledgling--task-id task))
+         (let* ((brief (org-fledgling--task-brief task))
+                (args (list "create-task" "--brief" brief))
+                (raw-output (org-fledgling--run-fledgling *org-fledgling-program* args))
+                (task-id (org-fledgling--parse-task-id raw-output)))
+           (message "新建了任务 %d" task-id)
+           ;; 及早写入任务的 ID，以便出错重试时可以直接复用已创建的任务。
+           (org-set-property "TASK_ID" (number-to-string task-id))))
+        (t
+         (let* ((task-id (org-fledgling--task-id task))
+                (brief (org-fledgling--task-brief task))
+                (args (list "change-task" "--brief" brief "--task-id" task-id))
+                (raw-output (org-fledgling--run-fledgling *org-fledgling-program* args)))
+           (message "修改了任务 %d" task-id)))))
 ;;; 私有的符号 END
 
 ;;; 暴露的符号 BEGIN
