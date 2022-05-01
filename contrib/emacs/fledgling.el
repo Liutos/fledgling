@@ -1,8 +1,14 @@
 ;;; 私有的符号 BEGIN
 (defclass org-fledgling--plan ()
-  ((trigger-time
+  ((id
+    :accessor org-fledgling--plan-id
+    :documentation "计划的 ID。"
+    :initarg :id)
+   (trigger-time
+    :accessor org-fledgling--plan-trigger-time
     :documentation "任务被触发的时刻。"
-    :initarg :trigger-time)))
+    :initarg :trigger-time
+    :type string)))
 
 (defclass org-fledgling--task ()
   ((brief
@@ -15,18 +21,25 @@
     :initarg :id)
    (plans
     :documentation "该任务设定的计划。"
-    :initarg :plans)))
+    :initarg :plans
+    :reader org-fledgling--task-plans)))
+
+(defvar *org-fledgling--property-plan-id* "PLAN_ID"
+  "用于在 org-mode 的条目中存储对应的 fledgling 中的任务的计划的 ID 的属性名。")
+
+(defvar *org-fledgling--property-task-id* "TASK_ID"
+  "用于在 org-mode 的条目中存储对应的 fledgling 中的任务的 ID 的属性名。")
 
 (defun org-fledgling--cons-task-plan ()
   "从当前光标所在的条目中构造出创建任务、计划所需要的数据。"
   (let* ((brief (nth 4 (org-heading-components)))
          (scheduled (org-entry-get nil "SCHEDULED"))
-         (task-id (org-entry-get nil "TASK_ID"))
-         ;; TODO: 此处还需要先将 SCHEDULED 转换为 TRIGGER-TIME 的格式才行。
+         (task-id (org-entry-get nil *org-fledgling--property-task-id*))
          (plans nil))
     (when scheduled
-      (setf plans (make-instance 'org-fledgling--plan
-                                 :trigger-time scheduled)))
+      (let ((trigger-time (org-fledgling--scheduled-to-trigger-time scheduled)))
+        (setf plans (list (make-instance 'org-fledgling--plan
+                                         :trigger-time trigger-time)))))
     (when task-id
       (setf task-id (string-to-number task-id)))
 
@@ -55,6 +68,12 @@
              ;; 其余参数需要保留引号。
              (prin1 arg))))))
 
+(defun org-fledgling--parse-plan-id (raw-output)
+  "解析创建计划的命令所打印出的计划的 ID，以数值类型返回。"
+  (message raw-output)
+  (let ((parsed (json-parse-string raw-output)))
+    (gethash "id" parsed)))
+
 (defun org-fledgling--parse-task-id (raw-output)
   "解析创建任务的命令所打印出的任务的 ID，以数值类型返回。
 
@@ -73,6 +92,35 @@
     (message "即将执行的命令为：%s" command)
     (shell-command-to-string command)))
 
+(defun org-fledgling--scheduled-to-trigger-time (scheduled)
+  "将条目的 SCHEDULED 属性转换为 fledgling 的子命令 create-plan 的 --trigger-time 选项的格式。"
+  (assert (stringp scheduled))
+  ;; 为了能够支持形如<2019-06-15 Sat 14:25-14:55>这样的时间戳，会先用正则表达式提取date-to-time能够处理的部分
+  (let* ((date (progn
+                 (string-match "\\([0-9]+-[0-9]+-[0-9]+ .+ [0-9]+:[0-9]+\\)" scheduled)
+                 (match-string 0 scheduled)))
+         (lst (date-to-time date))
+         (timestamp (+ (* (car lst) (expt 2 16))
+                       (cadr lst))))
+    (format-time-string "%Y-%m-%d %H:%M:%S" timestamp)))
+
+(defun org-fledgling--sync-plan (plan task-id)
+  "更新或创建一个计划。
+
+其中，TASK-ID 是计划 PLAN 所属的任务的 ID。"
+  (assert (typep plan org-fledgling--plan))
+  (assert (integerp task-id))
+  ;; TODO: 暂时仅支持创建计划。
+  (assert (null (org-fledgling--plan-id plan)))
+
+  (let* ((trigger-time (org-fledgling--plan-trigger-time plan))
+         (args (list "create-plan" "--task-id" task-id
+                     "--trigger-time" trigger-time))
+         (raw-output (org-fledgling--run-fledgling *org-fledgling-program* args))
+         (plan-id (org-fledgling--parse-plan-id raw-output)))
+    (message "创建了计划 %d" plan-id)
+    (org-set-property *org-fledgling--property-plan-id* (number-to-string plan-id))))
+
 (defun org-fledgling--sync-task (task)
   "更新或创建一个任务"
   (assert (typep task org-fledgling--task))
@@ -83,16 +131,28 @@
                 (task-id (org-fledgling--parse-task-id raw-output)))
            (message "新建了任务 %d" task-id)
            ;; 及早写入任务的 ID，以便出错重试时可以直接复用已创建的任务。
-           (org-set-property "TASK_ID" (number-to-string task-id))))
+           (org-set-property *org-fledgling--property-task-id* (number-to-string task-id))
+           task-id))
         (t
          (let* ((task-id (org-fledgling--task-id task))
                 (brief (org-fledgling--task-brief task))
                 (args (list "change-task" "--brief" brief "--task-id" task-id))
                 (raw-output (org-fledgling--run-fledgling *org-fledgling-program* args)))
-           (message "修改了任务 %d" task-id)))))
+           (message "修改了任务 %d" task-id)
+           task-id))))
 ;;; 私有的符号 END
 
 ;;; 暴露的符号 BEGIN
 (defvar *org-fledgling-program* nil
   "程序 fledgling 的可执行文件的路径。")
+
+(defun org-fledgling-sync-task-plan ()
+  "为当前条目创建任务和计划。"
+  (interactive)
+  (let* ((task (org-fledgling--cons-task-plan))
+         (plans (org-fledgling--task-plans task))
+         (task-id (org-fledgling--sync-task task)))
+    (when plans
+      (org-fledgling--sync-plan (nth 0 (org-fledgling--task-plans task))
+                                task-id))))
 ;;; 暴露的符号 END
