@@ -1,7 +1,9 @@
 # -*- coding: utf8 -*-
-import click
 from datetime import datetime, timedelta
 from typing import List, Optional, Set, Union
+import json
+
+import click
 
 from fledgling.app.use_case.create_plan import CreatePlanUseCase, IParams
 from fledgling.cli import setting
@@ -91,4 +93,9 @@ def create_plan(ctx: click.Context, duration, location_id: Optional[int],
         ),
         plan_repository=repository_factory.for_plan(),
     )
-    use_case.run()
+    plan = use_case.run()
+    is_json = ctx.obj['is_json']
+    if is_json:
+        click.echo(json.dumps({
+            'id': plan.id,
+        }))
