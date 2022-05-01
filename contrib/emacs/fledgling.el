@@ -33,13 +33,19 @@
 (defun org-fledgling--cons-task-plan ()
   "从当前光标所在的条目中构造出创建任务、计划所需要的数据。"
   (let* ((brief (nth 4 (org-heading-components)))
+         (plan-id (org-entry-get nil *org-fledgling--property-plan-id*))
          (scheduled (org-entry-get nil "SCHEDULED"))
          (task-id (org-entry-get nil *org-fledgling--property-task-id*))
          (plans nil))
     (when scheduled
-      (let ((trigger-time (org-fledgling--scheduled-to-trigger-time scheduled)))
-        (setf plans (list (make-instance 'org-fledgling--plan
-                                         :trigger-time trigger-time)))))
+      (let* ((trigger-time (org-fledgling--scheduled-to-trigger-time scheduled))
+             (plan (make-instance 'org-fledgling--plan
+                                  :trigger-time trigger-time)))
+        (when plan-id
+          (setf (org-fledgling--plan-id plan) plan-id))
+
+        (setf plans (list plan))))
+
     (when task-id
       (setf task-id (string-to-number task-id)))
 
@@ -110,16 +116,22 @@
 其中，TASK-ID 是计划 PLAN 所属的任务的 ID。"
   (assert (typep plan org-fledgling--plan))
   (assert (integerp task-id))
-  ;; TODO: 暂时仅支持创建计划。
-  (assert (null (org-fledgling--plan-id plan)))
-
-  (let* ((trigger-time (org-fledgling--plan-trigger-time plan))
-         (args (list "create-plan" "--task-id" task-id
-                     "--trigger-time" trigger-time))
-         (raw-output (org-fledgling--run-fledgling *org-fledgling-program* args))
-         (plan-id (org-fledgling--parse-plan-id raw-output)))
-    (message "创建了计划 %d" plan-id)
-    (org-set-property *org-fledgling--property-plan-id* (number-to-string plan-id))))
+  (let ((plan-id (org-fledgling--plan-id plan)))
+    (cond ((null plan-id)
+           (let* ((trigger-time (org-fledgling--plan-trigger-time plan))
+                  (args (list "create-plan" "--task-id" task-id
+                              "--trigger-time" trigger-time))
+                  (raw-output (org-fledgling--run-fledgling *org-fledgling-program* args))
+                  (plan-id (org-fledgling--parse-plan-id raw-output)))
+             (message "创建了计划 %d" plan-id)
+             (org-set-property *org-fledgling--property-plan-id* (number-to-string plan-id))))
+          (t
+           (let* ((trigger-time (org-fledgling--plan-trigger-time plan))
+                  (args (list "change-plan" "--plan-id"plan-id 
+                              "--trigger-time" trigger-time))
+                  (raw-output (org-fledgling--run-fledgling *org-fledgling-program* args)))
+             ;; 这里的 plan-id 来自于条目的属性，因此是个字符串类型。
+             (message "修改了计划 %s" plan-id))))))
 
 (defun org-fledgling--sync-task (task)
   "更新或创建一个任务"
