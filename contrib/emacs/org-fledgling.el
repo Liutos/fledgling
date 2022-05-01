@@ -168,3 +168,5 @@
       (org-fledgling--sync-plan (nth 0 (org-fledgling--task-plans task))
                                 task-id))))
 ;;; 暴露的符号 END
+
+(provide 'org-fledgling)
