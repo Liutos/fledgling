@@ -41,15 +41,17 @@ class FacadeAlerter(IAlerter):
         return self.alerter.alert(plan=plan, task=task)
 
 
-class WeChatAlerter(IAlerter):
-    """负责发送微信消息的通知类。"""
-    def __init__(self, send_key: str):
+class ServerChanAlerter(IAlerter):
+    """利用 server 酱发送消息的通知类。"""
+    def __init__(self, channels: List[str], send_key: str):
+        self.channels = channels
         self.send_key = send_key
 
     def alert(self, *, plan: Plan, task: Task):
         # server 酱的接口文档：https://sct.ftqq.com/sendkey
         url = 'https://sctapi.ftqq.com/{}.send'.format(self.send_key)
         data = {
+            'channel': ','.join(self.channels),
             'desp': task.brief,
             'title': task.brief[:32],  # server 酱的 title 的最大长度为 32。
         }

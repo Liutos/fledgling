@@ -8,7 +8,7 @@ from fledgling.app.use_case.event_loop import (
     EventLoopUseCase,
     IParams,
 )
-from fledgling.cli.alerter import Alerter, FacadeAlerter, WeChatAlerter
+from fledgling.cli.alerter import Alerter, FacadeAlerter, ServerChanAlerter
 from fledgling.cli.config import IniFileConfig
 from fledgling.cli.repository_factory import RepositoryFactory
 
@@ -37,7 +37,11 @@ def event_loop(ctx: click.Context, is_daemon: bool):
     plan_repository = repository_factory.for_plan()
     task_repository = repository_factory.for_task()
     # 实例化一个发通知的对象。
-    alerter = FacadeAlerter(Alerter(), WeChatAlerter(send_key=config.get('sc').get('send_key')))
+    wechat_alerter = ServerChanAlerter(
+        channels=config.get('sc').get('channels').split(','),
+        send_key=config.get('sc').get('send_key'),
+    )
+    alerter = FacadeAlerter(Alerter(), wechat_alerter)
 
     use_case = EventLoopUseCase(
         alerter=alerter,
