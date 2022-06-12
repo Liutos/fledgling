@@ -91,6 +91,10 @@ class ListPlanUseCase:
         if plan_ids is not None:
             criteria['plan_ids'] = plan_ids
         criteria['task_ids'] = self.params.get_task_ids()
+        # 如果指定了要查看的计划或者计划所属的任务的 ID，那么就不应当继续用 location 的 ID 来过滤。
+        if (plan_ids is not None or len(criteria['task_ids']) > 0) and 'location_id' in criteria:
+            del criteria['location_id']
+
         plans, count = self.plan_repository.list(**criteria)
         self.presenter.on_find_location()
         locations = self._find_locations(plans)
