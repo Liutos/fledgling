@@ -9,9 +9,11 @@ from fledgling.cli.repository_factory import RepositoryFactory
 
 class Params(IParams):
     def __init__(self, task_id: int, *, brief: Optional[str] = None,
+                 detail: Optional[str] = None,
                  keywords: Optional[str] = None,
                  status: Optional[str] = None):
         self.brief = brief
+        self.detail = detail
         self.keywords = []
         if keywords is not None:
             self.keywords = keywords.split(',')
@@ -22,6 +24,9 @@ class Params(IParams):
 
     def get_brief(self) -> Tuple[bool, Optional[str]]:
         return bool(self.brief), self.brief
+
+    def get_detail(self) -> Tuple[bool, str]:
+        return self.detail is not None, self.detail
 
     def get_keywords(self) -> Tuple[bool, List[str]]:
         return bool(self.keywords), self.keywords
@@ -35,16 +40,18 @@ class Params(IParams):
 
 @click.command()
 @click.option('--brief', help='任务简述', type=click.STRING)
+@click.option('--detail', default='', help=u'任务详情', type=str)
 @click.option('--keywords', help='关键字', type=click.STRING)
 @click.option('--status', help='状态。2 表示已完成，3 表示已取消', type=click.Choice(['2', '3']))
 @click.option('--task-id', help='任务ID', type=click.INT)
 @click.pass_context
-def change_task(ctx: click.Context, *, brief, keywords, status: str, task_id):
+def change_task(ctx: click.Context, *, brief, detail: str, keywords, status: str, task_id):
     """
     修改指定任务。
     """
     params = Params(
         brief=brief,
+        detail=detail,
         keywords=keywords,
         status=status,
         task_id=task_id,

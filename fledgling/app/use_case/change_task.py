@@ -15,6 +15,11 @@ class IParams(ABC):
         pass
 
     @abstractmethod
+    def get_detail(self) -> Tuple[bool, str]:
+        """获取输入的任务详情参数。"""
+        pass
+
+    @abstractmethod
     def get_keywords(self) -> Tuple[bool, List[str]]:
         pass
 
@@ -41,6 +46,11 @@ class ChangeTaskUseCase:
         found, brief = params.get_brief()
         if found:
             task.brief = brief
+
+        found, detail = params.get_detail()
+        if found:
+            task.detail = detail
+
         found, keywords = params.get_keywords()
         if found:
             task.keywords = keywords

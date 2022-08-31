@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 from datetime import datetime
 from typing import List, Optional, Tuple
+import json
 
 import click
 from tabulate import tabulate
@@ -50,24 +51,40 @@ class Params(IParams):
 
 
 class ConsolePresenter(IPresenter):
-    def show_task(self, *, tasks: List[Task]):
-        table = []
-        for task in tasks:
-            status_desc = ''
-            if task.is_cancelled():
-                status_desc = '已取消'
-            elif task.is_finished():
-                status_desc = '已完成'
-            trigger_time_desc = ''
-            if len(task.plans) > 0:
-                plan = task.plans[0]
-                trigger_time_desc = self._format_trigger_time(plan.duration, plan.trigger_time)
+    def __init__(self, *, is_json):
+        self._is_json = is_json
 
-            table.append([task.id, task.brief, status_desc, trigger_time_desc])
-        click.echo(tabulate(
-            headers=['任务ID', '任务简述', '状态', '下一次计划的时间'],
-            tabular_data=table,
-        ))
+    def show_task(self, *, tasks: List[Task]):
+        if self._is_json:
+            click.echo(json.dumps([{
+                'brief': task.brief,
+                'detail': task.detail,
+                'id': task.id,
+                'plans': [{
+                    'duration': plan.duration,
+                    'id': plan.id,
+                    'trigger_time': plan.trigger_time.strftime('%Y-%m-%d %H:%M:%S'),
+                } for plan in task.plans],
+                'status': task.status.value,
+            } for task in tasks]))
+        else:
+            table = []
+            for task in tasks:
+                status_desc = ''
+                if task.is_cancelled():
+                    status_desc = '已取消'
+                elif task.is_finished():
+                    status_desc = '已完成'
+                trigger_time_desc = ''
+                if len(task.plans) > 0:
+                    plan = task.plans[0]
+                    trigger_time_desc = self._format_trigger_time(plan.duration, plan.trigger_time)
+
+                table.append([task.id, task.brief, status_desc, trigger_time_desc])
+            click.echo(tabulate(
+                headers=['任务ID', '任务简述', '状态', '下一次计划的时间'],
+                tabular_data=table,
+            ))
 
     # TODO: 消除与文件 fledgling/cli/command/list_plan.py 中的同名方法的重复代码。
     def _format_trigger_time(self, duration: Optional[int], trigger_time: datetime) -> str:
@@ -119,7 +136,7 @@ def list_task(ctx: click.Context, *, keyword, page, per_page, plan_trigger_time,
     repository_factory = RepositoryFactory(config)
     use_case = ListTaskUseCase(
         params=params,
-        presenter=ConsolePresenter(),
+        presenter=ConsolePresenter(is_json=ctx.obj['is_json']),
         task_repository=repository_factory.for_task(),
     )
     use_case.run()

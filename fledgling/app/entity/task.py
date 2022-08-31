@@ -20,17 +20,19 @@ class TaskStatus(Enum):
 class Task:
     def __init__(self):
         self.brief = None
+        self.detail: str = ''
         self.id = None
         self.keywords = []
         self.plans: List[Plan] = []
         self.status: Optional[TaskStatus] = None
 
     @classmethod
-    def new(cls, *, brief, id_=None, keywords: List[str] = None,
+    def new(cls, *, brief, detail: str = '', id_=None, keywords: List[str] = None,
             plans: List[Plan] = None,
             status: TaskStatus = None) -> 'Task':
         instance = Task()
         instance.brief = brief
+        instance.detail = detail
         instance.id = id_
         instance.keywords = keywords or []
         instance.plans = plans

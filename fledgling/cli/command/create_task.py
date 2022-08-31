@@ -9,13 +9,18 @@ from fledgling.app.use_case.create_task import CreateTaskUseCase, IParams
 from fledgling.cli.repository_factory import RepositoryFactory
 
 
+# TODO: 最好只需要在该类中定义一次字段，就可以定义出相同的命令行选项。
 class Params(IParams):
-    def __init__(self, *, brief, keywords: str):
+    def __init__(self, *, brief, detail: str, keywords: str):
+        self._detail = detail
         self.brief = brief
         self.keywords = keywords
 
     def get_brief(self) -> str:
         return self.brief
+
+    def get_detail(self) -> str:
+        return self._detail
 
     def get_keywords(self) -> List[str]:
         keywords = self.keywords.split(',')
@@ -24,9 +29,10 @@ class Params(IParams):
 
 @click.command()
 @click.option('--brief', help='任务简述', required=True, type=str)
+@click.option('--detail', default='', help=u'任务详情', type=str)
 @click.option('--keywords', default='', help='关键字', type=str)
 @click.pass_context
-def create_task(ctx: click.Context, *, brief, keywords):
+def create_task(ctx: click.Context, *, brief, detail: str, keywords):
     """
     创建一个任务。
     """
@@ -34,6 +40,7 @@ def create_task(ctx: click.Context, *, brief, keywords):
     is_json: bool = ctx.obj['is_json']
     params = Params(
         brief=brief,
+        detail=detail,
         keywords=keywords,
     )
     repository_factory = RepositoryFactory(
@@ -48,6 +55,7 @@ def create_task(ctx: click.Context, *, brief, keywords):
     if is_json:
         click.echo(json.dumps({
             'brief': task.brief,
+            'detail': task.detail,
             'id': task.id,
         }))
     else:

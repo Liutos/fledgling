@@ -31,11 +31,13 @@ class TaskRepository(ITaskRepository):
         self.nest_client = nest_client
 
     def add(self, task: Task) -> Task:
+        encrypted_detail = self.enigma_machine.encrypt(task.detail)
         if task.id is None:
             crypted_brief = self.enigma_machine.encrypt(task.brief)
             response = self.nest_client.request(
                 json={
                     'brief': crypted_brief,
+                    'detail': encrypted_detail,
                     'keywords': task.keywords,
                 },
                 method='POST',
@@ -52,6 +54,7 @@ class TaskRepository(ITaskRepository):
             response = self.nest_client.request(
                 json={
                     'brief': crypted_brief,
+                    'detail': encrypted_detail,
                     'keywords': task.keywords,
                     'status': task.status.value,
                 },
@@ -129,8 +132,13 @@ class TaskRepository(ITaskRepository):
         for plan_dto in dto['plans']:
             plans.append(self._plan_dto_to_entity(plan_dto))
 
+        detail = ''
+        if dto['detail'] is not None:
+            detail = self.enigma_machine.decrypt(dto['detail'])
+
         return Task.new(
             brief=self.enigma_machine.decrypt(dto['brief']),
+            detail=detail,
             id_=dto['id'],
             plans=plans,
             status=TaskStatus(dto['status']),
