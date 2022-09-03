@@ -1,6 +1,8 @@
 # -*- coding: utf8 -*-
 from typing import List
 import json
+import subprocess
+import tempfile
 
 import click
 from tabulate import tabulate
@@ -27,17 +29,31 @@ class Params(IParams):
         return [keyword for keyword in keywords if len(keyword) > 0]
 
 
+def _get_detail_by_editor() -> str:
+    """通过调起编辑器来输入任务详情。"""
+    fp = tempfile.NamedTemporaryFile(dir='/tmp/', prefix='fledgling')
+    fp.close()
+    p = subprocess.Popen(['/usr/bin/vim', fp.name])
+    p.wait()
+    with open(fp.name) as f:
+        return f.read()
+
+
 @click.command()
 @click.option('--brief', help='任务简述', required=True, type=str)
 @click.option('--detail', default='', help=u'任务详情', type=str)
 @click.option('--keywords', default='', help='关键字', type=str)
+@click.option('-D', 'editor', default=False, help='唤起编辑器来填写任务详情', is_flag=True, show_default=True)
 @click.pass_context
-def create_task(ctx: click.Context, *, brief, detail: str, keywords):
+def create_task(ctx: click.Context, *, brief, detail: str, editor: bool, keywords):
     """
     创建一个任务。
     """
     config = ctx.obj['config']
     is_json: bool = ctx.obj['is_json']
+    if editor:
+        detail = _get_detail_by_editor()
+
     params = Params(
         brief=brief,
         detail=detail,
