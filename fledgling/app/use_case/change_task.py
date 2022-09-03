@@ -15,8 +15,10 @@ class IParams(ABC):
         pass
 
     @abstractmethod
-    def get_detail(self) -> Tuple[bool, str]:
-        """获取输入的任务详情参数。"""
+    def get_detail(self, detail: str) -> Tuple[bool, str]:
+        """获取输入的任务详情参数。
+
+参数 detail 为任务目前的详情内容，可用于交互式编辑现有内容的场景。"""
         pass
 
     @abstractmethod
@@ -47,7 +49,7 @@ class ChangeTaskUseCase:
         if found:
             task.brief = brief
 
-        found, detail = params.get_detail()
+        found, detail = params.get_detail(task.detail)
         if found:
             task.detail = detail
 
