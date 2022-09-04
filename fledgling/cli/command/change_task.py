@@ -4,7 +4,10 @@ from typing import List, Optional, Tuple
 import click
 
 from fledgling.app.use_case.change_task import ChangeTaskUseCase, IParams
-from fledgling.cli import editor
+from fledgling.cli import (
+    editor,
+    setting,
+)
 from fledgling.cli.repository_factory import RepositoryFactory
 
 
@@ -51,7 +54,7 @@ class Params(IParams):
 @click.option('--brief', help='任务简述', type=click.STRING)
 @click.option('--detail', default='', help=u'任务详情', type=str)
 @click.option('--keywords', help='关键字', type=click.STRING)
-@click.option('--status', help='状态。2 表示已完成，3 表示已取消', type=click.Choice(['2', '3']))
+@click.option('--status', help=setting.STATUS_HELP, type=click.Choice(setting.STATUS))
 @click.option('--task-id', help='任务ID', type=click.INT)
 @click.option('-D', 'from_editor', default=False, help='唤起编辑器来填写任务详情', is_flag=True, show_default=True)
 @click.pass_context

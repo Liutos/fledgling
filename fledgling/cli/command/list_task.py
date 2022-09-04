@@ -8,6 +8,7 @@ from tabulate import tabulate
 
 from fledgling.app.entity.task import Task
 from fledgling.app.use_case.list_task import IParams, IPresenter, ListTaskUseCase
+from fledgling.cli import setting
 from fledgling.cli.repository_factory import RepositoryFactory
 
 
@@ -117,7 +118,7 @@ class ConsolePresenter(IPresenter):
 @click.option('--page', default=1, show_default=True)
 @click.option('--per-page', default=10, show_default=True)
 @click.option('--plan-trigger-time', help='任务的计划触发时间范围', type=str)
-@click.option('--status', help='任务的状态', type=click.INT)
+@click.option('--status', help=setting.STATUS_HELP, type=click.Choice(setting.STATUS))
 @click.option('--task-ids', help='要查看的任务的ID', type=str)
 @click.pass_context
 def list_task(ctx: click.Context, *, keyword, page, per_page, plan_trigger_time, status, task_ids):
