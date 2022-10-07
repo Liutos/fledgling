@@ -55,6 +55,11 @@ class ServerChanAlerter(IAlerter):
             'desp': task.brief,
             'title': task.brief[:32],  # server 酱的 title 的最大长度为 32。
         }
-        response = requests.post(url, data=data)
+        try:
+            response = requests.post(url, data=data)
+        except requests.exceptions.ConnectionError as e:
+            logging.error('请求 server 酱时发生了错误：{}'.format(str(e)))
+            return None
+
         logging.debug('发送了微信消息：{}'.format(response.text))
         return None
