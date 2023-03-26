@@ -1,8 +1,10 @@
 # -*- coding: utf8 -*-
 from fledgling.app.use_case.activate_user import IUserService
+from fledgling.app.use_case.event_loop import IDoNotDisturbService
 from fledgling.cli.config import IConfig
 from fledgling.cli.enigma_machine import FernetEnigmaMachine
 from fledgling.cli.nest_client import NestClient
+from fledgling.service.do_not_disturb import DoNotDisturbService
 from fledgling.service.user import NestUserService
 
 
@@ -30,6 +32,9 @@ class ServiceFactory:
             protocol=protocol,
         )
         self.nest_client = nest_client
+
+    def get_do_not_disturb_service(self) -> IDoNotDisturbService:
+        return DoNotDisturbService()
 
     def user(self) -> IUserService:
         return NestUserService(

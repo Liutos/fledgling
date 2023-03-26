@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 from abc import ABC, abstractmethod
-from datetime import datetime
+import datetime
 import logging
 import subprocess
 import time
@@ -27,7 +27,26 @@ class IAlerter(ABC):
         pass
 
 
+class IDoNotDisturbService(ABC):
+    """提供与勿扰模式有关的服务。"""
+    @abstractmethod
+    def check_do_not_disturb(self, begin_time: datetime.time, end_time: datetime.time,
+                             *, now: datetime.datetime = None) -> bool:
+        """如果当前时间落在了用户设置的勿扰时段内，就返回 True，否则返回 False。"""
+        pass
+
+
 class IParams(ABC):
+    @abstractmethod
+    def get_do_not_disturb_begin_time(self) -> Optional[datetime.time]:
+        """获得勿扰模式的开始时间。"""
+        pass
+
+    @abstractmethod
+    def get_do_not_disturb_end_time(self) -> Optional[datetime.time]:
+        """获得勿扰模式的结束时间。如果该方法的返回值早于方法 get_do_not_disturb_begin_time 的返回值，那么它表示的是明天的同一时刻。"""
+        pass
+
     @abstractmethod
     def get_location_name(self) -> Optional[str]:
         pass
@@ -55,10 +74,12 @@ class AlertState:
 
 class EventLoopUseCase:
     def __init__(self, *, alerter, location_repository: ILocationRepository,
+                 do_not_disturb_service: IDoNotDisturbService,
                  params: IParams, plan_repository, task_repository):
         assert isinstance(alerter, IAlerter)
         assert isinstance(plan_repository, IPlanRepository)
         assert isinstance(task_repository, ITaskRepository)
+        self._do_not_disturb_service = do_not_disturb_service
         self.alerter = alerter
         self.alerts = []
         self.location_repository = location_repository
@@ -78,9 +99,13 @@ class EventLoopUseCase:
 
         while True:
             try:
-                plan = self.plan_repository.pop(location_id=location_id)
+                if not self._check_do_not_disturb():
+                    plan = None
+                else:
+                    plan = self.plan_repository.pop(location_id=location_id)
+
                 if plan:
-                    if plan.is_outdated(datetime.now()):
+                    if plan.is_outdated(datetime.datetime.now()):
                         logging.info('计划{}已经过期了。trigger_time={}，duration={}'.format(
                             plan.id,
                             plan.trigger_time.strftime('%Y-%m-%d %H:%M:%S'),
@@ -105,6 +130,18 @@ class EventLoopUseCase:
                 logging.warning('获取任务失败')
             self._sort_out_children()
             time.sleep(_IDLE_SECONDS)
+
+    def _check_do_not_disturb(self) -> bool:
+        """检查当前是否在勿扰的时间段内。"""
+        begin_time = self.params.get_do_not_disturb_begin_time()
+        if begin_time is None:
+            return False
+
+        end_time = self.params.get_do_not_disturb_end_time()
+        if end_time is None:
+            return False
+
+        return self._do_not_disturb_service.check_do_not_disturb(begin_time, end_time)
 
     def _keep_child_process(self, *, plan: Plan, process: subprocess.Popen):
         self.alerts.append(AlertState(
