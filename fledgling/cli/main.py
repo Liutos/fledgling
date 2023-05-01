@@ -22,6 +22,7 @@ from fledgling.cli.command.event_loop import event_loop
 from fledgling.cli.command.list_location import list_location
 from fledgling.cli.command.list_plan import list_plan
 from fledgling.cli.command.list_task import list_task
+from fledgling.cli.command.send_message import send_message
 from fledgling.cli.config import IniFileConfig
 
 
@@ -56,6 +57,7 @@ cli.add_command(list_plan)
 
 cli.add_command(list_task)
 cli.add_command(register)
+cli.add_command(send_message)
 
 log_dir = xdg_data_home().joinpath('fledgling')
 if not log_dir.is_dir():

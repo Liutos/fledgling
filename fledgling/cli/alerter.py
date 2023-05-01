@@ -13,7 +13,7 @@ from fledgling.app.use_case.event_loop import IAlerter
 class Alerter(IAlerter):
     def alert(self, *, plan: Plan, task: Task):
         args: List[str] = []
-        args.append('alerter')
+        args.append('/usr/local/bin/alerter')
         args.append('-title')
         args.append('#{} {}'.format(task.id, task.brief))
         args.append('-sound')
