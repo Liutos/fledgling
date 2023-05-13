@@ -99,7 +99,7 @@ class EventLoopUseCase:
 
         while True:
             try:
-                if not self._check_do_not_disturb():
+                if self._check_do_not_disturb():
                     plan = None
                 else:
                     plan = self.plan_repository.pop(location_id=location_id)
