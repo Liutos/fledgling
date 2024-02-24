@@ -1,9 +1,11 @@
 # -*- coding: utf8 -*-
+import sys
 from datetime import datetime, timedelta
 from typing import List, Optional, Set, Tuple, Union
 
 import click
 
+from fledgling.app.entity.plan import PlanRepositoryError
 from fledgling.app.use_case.change_plan import ChangePlanUseCase, IParams
 from fledgling.cli import setting
 from fledgling.cli.repository_factory import RepositoryFactory
@@ -95,4 +97,7 @@ def change_plan(ctx: click.Context, *, duration, location_id,
         params=params,
         plan_repository=repository_factory.for_plan(),
     )
-    use_case.run()
+    try:
+        use_case.run()
+    except PlanRepositoryError as e:
+        print(str(e), file=sys.stderr)
