@@ -29,7 +29,7 @@ class Params(IParams):
 
 
 @click.command()
-@click.option('--brief', help='任务简述', required=True, type=str)
+@click.option('-b', '--brief', help='任务简述', required=True, type=str)
 @click.option('--detail', default='', help=u'任务详情', type=str)
 @click.option('--keywords', default='', help='关键字', type=str)
 @click.option('-D', 'from_editor', default=False, help='唤起编辑器来填写任务详情', is_flag=True, show_default=True)

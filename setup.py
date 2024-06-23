@@ -32,6 +32,7 @@ setuptools.setup(
         "click",
         "colored",
         "cryptography",
+        "jieba",
         "python-daemon",
         "requests",
         "tabulate",

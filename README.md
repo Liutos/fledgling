@@ -151,3 +151,11 @@ python setup.py sdist
 ```shell
 pip install ./dist/fledgling-0.0.1.tar.gz
 ```
+
+## 如何使用修改中的代码？
+
+以使用仓库目录下的代码来创建任务为例
+
+```shell
+PYTHONPATH="${PYTHONPATH}:`pwd`" python fledgling/cli/main.py create-task --help
+```
