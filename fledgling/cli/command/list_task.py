@@ -114,7 +114,7 @@ class ConsolePresenter(IPresenter):
 
 
 @click.command()
-@click.option('--keyword', help='过滤任务的关键字')
+@click.option('-k', '--keyword', help='过滤任务的关键字')
 @click.option('--page', default=1, show_default=True)
 @click.option('--per-page', default=10, show_default=True)
 @click.option('--plan-trigger-time', help='任务的计划触发时间范围', type=str)

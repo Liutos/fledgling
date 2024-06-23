@@ -1,4 +1,5 @@
 # -*- coding: utf8 -*-
+import typing
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 from typing import List, Optional, Tuple, Union
@@ -86,7 +87,7 @@ class TaskRepository(ITaskRepository):
         except NetworkError:
             raise TaskRepositoryError()
 
-    def list(self, *, keyword: Optional[str] = None, page, per_page,
+    def list(self, *, keywords: typing.List[str] = None, page, per_page,
              plan_trigger_time: Optional[Tuple[datetime, datetime]] = None,
              status: Optional[int] = None,
              task_ids: Union[None, List[int]] = None):
@@ -94,8 +95,9 @@ class TaskRepository(ITaskRepository):
             'page': page,
             'per_page': per_page,
         }
-        if keyword is not None:
-            params['keyword'] = keyword
+        if keywords is not None:
+            params['keywords'] = keywords
+
         if plan_trigger_time:
             params['plan_trigger_time'] = ','.join([
                 plan_trigger_time[0].strftime('%Y-%m-%d %H:%M:%S'),

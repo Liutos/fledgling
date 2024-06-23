@@ -1,4 +1,5 @@
 # -*- coding: utf8 -*-
+import typing
 from abc import ABC, abstractmethod
 from datetime import datetime
 from enum import Enum
@@ -59,7 +60,7 @@ class ITaskRepository(ABC):
         pass
 
     @abstractmethod
-    def list(self, *, keyword: Optional[str] = None, page, per_page,
+    def list(self, *, keywords: typing.List[str] = None, page, per_page,
              plan_trigger_time: Optional[Tuple[datetime, datetime]] = None,
              status: Optional[int] = None,
              task_ids: Union[None, List[int]] = None):

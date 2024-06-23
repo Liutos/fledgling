@@ -1,12 +1,29 @@
 # -*- coding: utf8 -*-
+import hashlib
+import typing
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import List, Optional, Tuple
+
+import jieba
 
 from fledgling.app.entity.task import ITaskRepository, Task
 
 
 class IParams(ABC):
+    def get_keyword_hashes(self) -> typing.List[str]:
+        """获取关键字分词后的哈希值。"""
+        result = []
+        keyword = self.get_keyword()
+        if not keyword:
+            return result
+
+        parts = jieba.cut_for_search(keyword)
+        for part in parts:
+            result.append(hashlib.md5(part.encode('UTF-8')).hexdigest())
+
+        return result
+
     @abstractmethod
     def get_keyword(self) -> Optional[str]:
         pass
@@ -45,12 +62,12 @@ class ListTaskUseCase:
 
     def run(self):
         params = self.params
-        keyword = params.get_keyword()
+        hashes = params.get_keyword_hashes()
         page = params.get_page()
         per_page = params.get_per_page()
         task_ids = params.get_task_ids()
         tasks = self.task_repository.list(
-            keyword=keyword,
+            keywords=hashes,
             page=page,
             per_page=per_page,
             plan_trigger_time=params.get_plan_trigger_time(),
