@@ -27,7 +27,7 @@ from fledgling.cli.config import IniFileConfig
 
 
 @click.group()
-@click.option('--config-file', help='配置文件路径')
+@click.option('--config-file', default=IniFileConfig.get_default_config_file(), help='配置文件路径', show_default=True)
 @click.option('--json', 'is_json', default=False, help='是否以 JSON 格式输出结果', is_flag=True, type=click.BOOL)
 @click.pass_context
 def cli(ctx: click.Context, *, config_file: Optional[str],

@@ -37,14 +37,13 @@ class IniFileConfig(IConfig):
     基于.ini文件的配置。
     """
     def __init__(self, *, config_file: Optional[str] = None):
-        config_dir = xdg_config_home().joinpath('fledgling')
-        if config_file is None:
-            config_file = config_dir.joinpath('config.ini')
-        if isinstance(config_file, str):
-            config_file = pathlib.Path(config_file)
+        if config_file:
+            self.config_file = pathlib.Path(config_file)
+        else:
+            self.config_file = self.get_default_config_file()
+
         self.config = configparser.ConfigParser()
-        self.config_dir = config_dir
-        self.config_file = config_file
+        self.config_dir = self.get_default_config_dir()
 
     def dump(self, is_overwrite):
         if not self.config_dir.is_dir():
@@ -66,6 +65,17 @@ class IniFileConfig(IConfig):
 
             result = result[key]
         return result
+
+    @classmethod
+    def get_default_config_dir(cls):
+        """配置文件所在的默认目录。"""
+        return xdg_config_home().joinpath('fledgling')
+
+    @classmethod
+    def get_default_config_file(cls):
+        """默认配置文件。"""
+        default_config_dir = cls.get_default_config_dir()
+        return default_config_dir.joinpath('config.ini')
 
     def load(self):
         if not self.config_dir.is_dir():
