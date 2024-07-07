@@ -10,6 +10,7 @@ class PlanRepositoryError(Exception):
 
 class Plan:
     def __init__(self):
+        self.crontab: str = ''
         self.duration: Optional[int] = None
         self.id = None
         self.location = None
@@ -26,7 +27,7 @@ class Plan:
         self.visible_wdays_description: str = ''
 
     @classmethod
-    def new(cls, *, duration: Optional[int] = None,
+    def new(cls, *, crontab: str = '', duration: Optional[int] = None,
             id_=None, location_id: int, repeat_interval: Union[None, timedelta] = None,
             repeat_type=None,
             repeating_description: Union[None, str] = None,
@@ -35,6 +36,7 @@ class Plan:
             visible_wdays=None,
             visible_wdays_description: Optional[str] = None):
         instance = Plan()
+        instance.crontab = crontab
         instance.duration = duration
         instance.id = id_
         instance.location_id = location_id

@@ -120,6 +120,7 @@ class PlanRepository(IPlanRepository):
 
     def _dto_to_entity(self, dto: dict) -> Plan:
         plan = Plan()
+        plan.crontab = dto['crontab']
         plan.duration = dto['duration']
         plan.id = dto['id']
         plan.location_id = dto['location_id']
@@ -141,6 +142,7 @@ class PlanRepository(IPlanRepository):
         if repeat_interval is not None:
             seconds = int(repeat_interval.total_seconds())
         return {
+            'crontab': plan.crontab,
             'duration': plan.duration,
             'location_id': plan.location_id,
             'repeat_interval': seconds,

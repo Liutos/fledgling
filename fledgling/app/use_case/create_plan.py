@@ -1,4 +1,5 @@
 # -*- coding: utf8 -*-
+import typing
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 from typing import Optional, Set, Union
@@ -7,6 +8,10 @@ from fledgling.app.entity.plan import IPlanRepository, Plan
 
 
 class IParams(ABC):
+    @abstractmethod
+    def get_crontab(self) -> typing.Optional[str]:
+        pass
+
     @abstractmethod
     def get_duration(self) -> Union[None, int]:
         pass
@@ -58,6 +63,7 @@ class CreatePlanUseCase:
         visible_hours = params.get_visible_hours()
         visible_wdays = params.get_visible_wdays()
         plan = Plan.new(
+            crontab=params.get_crontab(),
             duration=duration,
             location_id=location_id,
             repeat_interval=repeat_interval,
