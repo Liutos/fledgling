@@ -29,6 +29,7 @@ class MockNestClient(INestGateway):
         if method == 'GET':
             return MockResponse({
                 'result': {
+                    'crontab': '',
                     'duration': 0,
                     'id': 233,
                     'location_id': None,
