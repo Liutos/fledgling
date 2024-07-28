@@ -1,4 +1,5 @@
 # -*- coding: utf8 -*-
+import typing
 from abc import ABC, abstractmethod
 import datetime
 import logging
@@ -32,6 +33,12 @@ class IDoNotDisturbService(ABC):
     @abstractmethod
     def check_do_not_disturb(self, begin_time: datetime.time, end_time: datetime.time,
                              *, now: datetime.datetime = None) -> bool:
+        """如果当前时间落在了用户设置的勿扰时段内，就返回 True，否则返回 False。"""
+        pass
+
+    @abstractmethod
+    def check_do_not_disturb_with_reason(self, begin_time: datetime.time, end_time: datetime.time,
+                                         *, now: datetime.datetime = None) -> typing.Tuple[bool, str]:
         """如果当前时间落在了用户设置的勿扰时段内，就返回 True，否则返回 False。"""
         pass
 
@@ -99,7 +106,9 @@ class EventLoopUseCase:
 
         while True:
             try:
-                if self._check_do_not_disturb():
+                do_not_disturb, reason = self._check_do_not_disturb()
+                logging.info('_check_do_not_disturb 检查结果：%s' % reason)
+                if do_not_disturb:
                     plan = None
                 else:
                     plan = self.plan_repository.pop(location_id=location_id)
@@ -131,17 +140,17 @@ class EventLoopUseCase:
             self._sort_out_children()
             time.sleep(_IDLE_SECONDS)
 
-    def _check_do_not_disturb(self) -> bool:
+    def _check_do_not_disturb(self) -> typing.Tuple[bool, str]:
         """检查当前是否在勿扰的时间段内。"""
         begin_time = self.params.get_do_not_disturb_begin_time()
         if begin_time is None:
-            return False
+            return False, '起点时间为空'
 
         end_time = self.params.get_do_not_disturb_end_time()
         if end_time is None:
-            return False
+            return False, '终点时间为空'
 
-        return self._do_not_disturb_service.check_do_not_disturb(begin_time, end_time)
+        return self._do_not_disturb_service.check_do_not_disturb_with_reason(begin_time, end_time)
 
     def _keep_child_process(self, *, plan: Plan, process: subprocess.Popen):
         self.alerts.append(AlertState(
