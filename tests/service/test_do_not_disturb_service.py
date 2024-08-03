@@ -32,6 +32,17 @@ class DoNotDisturbServiceTestCase(unittest.TestCase):
             now=datetime.datetime(2023, 3, 26, 17, 32)
         ))
 
+    def test_check_do_not_disturb_yes3(self):
+        """测试当前时间已经是第二天、并且早于结束时间的场景。"""
+        service = DoNotDisturbService()
+        do_not_disturb, reason = service.check_do_not_disturb_with_reason(
+            datetime.time(hour=23, minute=00),
+            datetime.time(hour=9, minute=0),
+            now=datetime.datetime(2024, 8, 2, 2, 31)
+        )
+        print('reason', reason)
+        self.assertTrue(do_not_disturb)
+
 
 if __name__ == '__main__':
     unittest.main()
