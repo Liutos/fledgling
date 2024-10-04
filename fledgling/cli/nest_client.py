@@ -100,9 +100,10 @@ class NestClient(INestGateway):
 
             content = {}
             if response is not None:
+                headers = response.headers
                 content = {
-                    'mimeType': response.headers['Content-Type'],
-                    'size': response.headers['Content-Length'],
+                    'mimeType': headers.get('Content-Type', ''),
+                    'size': headers.get('Content-Length', ''),
                     'text': response.text,
                 }
 

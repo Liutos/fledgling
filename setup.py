@@ -28,7 +28,7 @@ setuptools.setup(
     ],
     include_package_data=True,
     install_requires=[
-        "PyInquirer",
+        "PyInquirer==1.0.3",
         "click",
         "colored",
         "cryptography",
