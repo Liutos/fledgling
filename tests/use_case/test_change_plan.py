@@ -1,4 +1,5 @@
 # -*- coding: utf8 -*-
+import typing
 from datetime import timedelta
 from typing import Set, Tuple, Union
 
@@ -54,6 +55,9 @@ class MockNestClient(INestGateway):
 
 
 class MockParams(IParams):
+    def get_crontab(self) -> typing.Tuple[bool, typing.Optional[str]]:
+        return False, None
+
     def get_duration(self) -> Tuple[bool, Union[None, int]]:
         return True, 60
 

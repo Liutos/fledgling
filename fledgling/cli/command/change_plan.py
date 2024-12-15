@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 import sys
+import typing
 from datetime import datetime, timedelta
 from typing import List, Optional, Set, Tuple, Union
 
@@ -12,13 +13,14 @@ from fledgling.cli.repository_factory import RepositoryFactory
 
 
 class Params(IParams):
-    def __init__(self, *, duration: Union[None, int] = None,
+    def __init__(self, *, crontab: typing.Optional[str], duration: Union[None, int] = None,
                  location_id: Union[None, int] = None,
                  plan_id,
                  repeat_interval: Union[None, int] = None,
                  repeat_type, trigger_time: str,
                  visible_hours: Union[None, List[int]] = None,
                  visible_wdays: Union[None, List[int]] = None):
+        self._crontab = crontab
         self.duration = duration
         self.location_id = location_id
         self.plan_id = plan_id
@@ -27,6 +29,9 @@ class Params(IParams):
         self.trigger_time = trigger_time
         self.visible_hours = set(visible_hours or [])
         self.visible_wdays = set(visible_wdays or [])
+
+    def get_crontab(self) -> typing.Tuple[bool, typing.Optional[str]]:
+        return bool(self._crontab), self._crontab
 
     def get_duration(self) -> Tuple[bool, Union[None, int]]:
         return bool(self.duration), self.duration
@@ -67,6 +72,7 @@ def validate_visible_hours(ctx, param, value: Union[None, str]):
 
 
 @click.command()
+@click.option('-c', '--crontab', default='', help='crontab 风格的触发周期模式')
 @click.option('--duration', type=click.INT)
 @click.option('--location-id', type=click.INT)
 @click.option('--plan-id', required=True, type=click.INT)
@@ -76,12 +82,13 @@ def validate_visible_hours(ctx, param, value: Union[None, str]):
 @click.option('--visible-hours', callback=validate_visible_hours, type=click.STRING)
 @click.option('--visible-wdays', callback=validate_visible_hours, type=click.STRING)
 @click.pass_context
-def change_plan(ctx: click.Context, *, duration, location_id,
+def change_plan(ctx: click.Context, *, crontab, duration, location_id,
                 plan_id, repeat_interval, repeat_type, trigger_time, visible_hours, visible_wdays):
     """
     修改指定计划。
     """
     params = Params(
+        crontab=crontab,
         duration=duration,
         location_id=location_id,
         plan_id=plan_id,

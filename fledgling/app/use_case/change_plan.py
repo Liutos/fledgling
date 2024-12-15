@@ -1,4 +1,5 @@
 # -*- coding: utf8 -*-
+import typing
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 from typing import Optional, Set, Tuple, Union
@@ -11,6 +12,10 @@ class PlanNotFoundError(Exception):
 
 
 class IParams(ABC):
+    @abstractmethod
+    def get_crontab(self) -> typing.Tuple[bool, typing.Optional[str]]:
+        pass
+
     @abstractmethod
     def get_duration(self) -> Tuple[bool, Union[None, int]]:
         pass
@@ -56,6 +61,10 @@ class ChangePlanUseCase:
         plan = self.plan_repository.get(id_=params.get_plan_id())
         if plan is None:
             raise PlanNotFoundError()
+
+        found, crontab = params.get_crontab()
+        if found:
+            plan.crontab = crontab
 
         found, duration = params.get_duration()
         if found:
