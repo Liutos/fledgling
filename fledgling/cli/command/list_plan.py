@@ -84,6 +84,7 @@ class ConsolePresenter(IPresenter):
         now = datetime.now()
         for plan in self.plans:
             row = [
+                plan.task_id,
                 plan.id,
                 self._format_trigger_time(plan.duration, plan.trigger_time),
                 plan.task.brief,
@@ -94,7 +95,7 @@ class ConsolePresenter(IPresenter):
                 plan.visible_wdays_description,
             ]
             table.append(row)
-        headers = ['计划ID', '计划时间', '任务简述', '重复类型', '是否可见', '地点', '几点可见', '周几可见']
+        headers = ['任务 ID', '计划ID', '计划时间', '任务简述', '重复类型', '是否可见', '地点', '几点可见', '周几可见']
         column_widths = self._compute_column_widths(headers, table)
         separator_row = ['-' * width for width in column_widths]
         self._print_row(column_widths, headers)
