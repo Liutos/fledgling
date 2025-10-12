@@ -98,7 +98,7 @@ class EventLoopUseCase:
         params = self.params
         location_id = None
         location_name = params.get_location_name()
-        if location_name is not None:
+        if location_name:
             locations = self.location_repository.find(name=location_name)
             if len(locations) == 0:
                 raise InvalidLocationError(name=location_name)
