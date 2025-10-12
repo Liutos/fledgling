@@ -71,7 +71,7 @@ class ListPlanUseCase:
         location_id = None
         location_name = self.params.get_location_name()
         no_location = self.params.get_no_location()
-        if not no_location and location_name is not None:
+        if not no_location and location_name:
             locations = self.location_repository.find(name=location_name)
             if len(locations) == 0:
                 self.presenter.on_invalid_location(error=InvalidLocationError(name=location_name))
