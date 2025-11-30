@@ -26,12 +26,21 @@ from fledgling.cli.command.send_message import send_message
 from fledgling.cli.config import IniFileConfig
 
 
+def debug_print(msg: str):
+    print(f'\033[32m[DEBUG] {msg}\033[0m')
+
+
 @click.group()
 @click.option('--config-file', default=IniFileConfig.get_default_config_file(), help='配置文件路径', show_default=True)
+@click.option('--debug', default=False, help='是否以调试模式运行', is_flag=True, type=click.BOOL)
 @click.option('--json', 'is_json', default=False, help='是否以 JSON 格式输出结果', is_flag=True, type=click.BOOL)
 @click.pass_context
 def cli(ctx: click.Context, *, config_file: Optional[str],
-        is_json: bool):
+        is_json: bool,
+        debug: bool):
+    if debug:
+        debug_print('加载配置文件 %s' % config_file)
+
     config = IniFileConfig(config_file=config_file)
     config.load()
     ctx.ensure_object(dict)
