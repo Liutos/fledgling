@@ -55,7 +55,7 @@ class Params(IParams):
 @click.option('--detail', default='', help=u'任务详情', type=str)
 @click.option('--keywords', help='关键字', type=click.STRING)
 @click.option('--status', help=setting.STATUS_HELP, type=click.Choice(setting.STATUS))
-@click.option('--task-id', help='任务ID', type=click.INT)
+@click.option('--task-id', help='任务ID', type=click.INT, required=True)
 @click.option('-D', 'from_editor', default=False, help='唤起编辑器来填写任务详情', is_flag=True, show_default=True)
 @click.pass_context
 def change_task(ctx: click.Context, *, brief, detail: str, from_editor: bool, keywords, status: str, task_id):
